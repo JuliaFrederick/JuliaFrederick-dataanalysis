@@ -452,7 +452,7 @@ div.tocify {
       <a href="./visual.html">Visualisation</a>
     </li>
     <li>
-      <a href="./tidytues.hteml">TidyTuesday1</a>
+      <a href="./tidytues.html">TidyTuesday1</a>
     </li>
   </ul>
 </li>
@@ -499,45 +499,37 @@ div.tocify {
 <a class="sourceLine" id="cb1-2" title="2">marveldata &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;./data/marvel-wikia-data.csv&quot;</span>)</a></code></pre></div>
 <p>Load libraries needed</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(dplyr)</a></code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">library</span>(RColorBrewer)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="kw">library</span>(RColorBrewer)</a></code></pre></div>
 <div id="recreating-new-comic-book-characters-introduced-per-year" class="section level3">
 <h3>Recreating “New Comic Book Characters introduced Per Year”</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co">#combine data into a single data set </span></a>
-<a class="sourceLine" id="cb7-2" title="2">dcdata<span class="op">$</span>type &lt;-<span class="st"> &quot;DC&quot;</span></a>
-<a class="sourceLine" id="cb7-3" title="3">marveldata<span class="op">$</span>type &lt;-<span class="st"> &quot;Marvel&quot;</span></a>
-<a class="sourceLine" id="cb7-4" title="4"><span class="kw">colnames</span>(marveldata)[<span class="kw">colnames</span>(marveldata)<span class="op">==</span><span class="st">&quot;Year&quot;</span>] &lt;-<span class="st"> &quot;YEAR&quot;</span></a>
-<a class="sourceLine" id="cb7-5" title="5">comicdata&lt;-<span class="kw">rbind</span>(marveldata, dcdata)</a>
-<a class="sourceLine" id="cb7-6" title="6"></a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="co">#Want a total number of characters introduced each year for marvel and dc separately</span></a>
-<a class="sourceLine" id="cb7-8" title="8">labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">DC=</span><span class="st">&quot;DC, New Earth continuity&quot;</span>, <span class="dt">Marvel=</span><span class="st">&quot;Marvel, Earth-616 continuity&quot;</span>) </a>
-<a class="sourceLine" id="cb7-9" title="9"><span class="kw">ggplot</span>(comicdata) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-10" title="10"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x=</span>YEAR, <span class="dt">fill=</span>type), <span class="dt">width =</span> <span class="fl">0.73</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;steelblue1&quot;</span>, <span class="st">&quot;orangered&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-11" title="11"><span class="st">   </span><span class="kw">facet_grid</span>(.<span class="op">~</span>type, <span class="dt">labeller =</span> <span class="kw">labeller</span>(<span class="dt">type=</span>labels)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-12" title="12"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">strip.text.x =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">13</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
-<a class="sourceLine" id="cb7-13" title="13">          <span class="dt">strip.text.y =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">13</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
-<a class="sourceLine" id="cb7-14" title="14">          <span class="dt">strip.background =</span> <span class="kw">element_rect</span>(<span class="dt">fill =</span> <span class="st">&quot;grey93&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-15" title="15"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;New Comic Book Characters Introduced Per Year&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-16" title="16"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">lineheight =</span> <span class="fl">.8</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
-<a class="sourceLine" id="cb7-17" title="17">          <span class="dt">axis.title.x =</span> <span class="kw">element_blank</span>(),</a>
-<a class="sourceLine" id="cb7-18" title="18">          <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-19" title="19"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">plot.background =</span> <span class="kw">element_rect</span>(<span class="dt">fill=</span><span class="st">&quot;grey93&quot;</span>),</a>
-<a class="sourceLine" id="cb7-20" title="20">          <span class="dt">panel.grid.major =</span> <span class="kw">element_line</span>(<span class="dt">color=</span><span class="st">&quot;grey&quot;</span>),</a>
-<a class="sourceLine" id="cb7-21" title="21">          <span class="dt">panel.grid.minor =</span> <span class="kw">element_line</span>(<span class="dt">color=</span><span class="st">&quot;grey&quot;</span>),</a>
-<a class="sourceLine" id="cb7-22" title="22">          <span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-23" title="23"><span class="st">    </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)<span class="op">+</span></a>
-<a class="sourceLine" id="cb7-24" title="24"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks=</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">500</span>,<span class="dv">100</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-25" title="25"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">c</span>(<span class="dv">1940</span>,<span class="dv">1960</span>,<span class="dv">1980</span>,<span class="dv">2000</span>),</a>
-<a class="sourceLine" id="cb7-26" title="26">                   <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;1940&quot;</span>,<span class="st">&quot;&#39;60&quot;</span>,<span class="st">&quot;&#39;80&quot;</span>,<span class="st">&quot;2000&quot;</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-27" title="27"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid.minor.y =</span> <span class="kw">element_blank</span>(), <span class="dt">panel.grid.minor.x =</span> <span class="kw">element_blank</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="co">#combine data into a single data set </span></a>
+<a class="sourceLine" id="cb3-2" title="2">dcdata<span class="op">$</span>type &lt;-<span class="st"> &quot;DC&quot;</span></a>
+<a class="sourceLine" id="cb3-3" title="3">marveldata<span class="op">$</span>type &lt;-<span class="st"> &quot;Marvel&quot;</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="kw">colnames</span>(marveldata)[<span class="kw">colnames</span>(marveldata)<span class="op">==</span><span class="st">&quot;Year&quot;</span>] &lt;-<span class="st"> &quot;YEAR&quot;</span></a>
+<a class="sourceLine" id="cb3-5" title="5">comicdata&lt;-<span class="kw">rbind</span>(marveldata, dcdata)</a>
+<a class="sourceLine" id="cb3-6" title="6"></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#Want a total number of characters introduced each year for marvel and dc separately</span></a>
+<a class="sourceLine" id="cb3-8" title="8">labels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">DC=</span><span class="st">&quot;DC, New Earth continuity&quot;</span>, <span class="dt">Marvel=</span><span class="st">&quot;Marvel, Earth-616 continuity&quot;</span>) </a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="kw">ggplot</span>(comicdata) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x=</span>YEAR, <span class="dt">fill=</span>type), <span class="dt">width =</span> <span class="fl">0.73</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;steelblue1&quot;</span>, <span class="st">&quot;orangered&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="st">   </span><span class="kw">facet_grid</span>(.<span class="op">~</span>type, <span class="dt">labeller =</span> <span class="kw">labeller</span>(<span class="dt">type=</span>labels)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">strip.text.x =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">13</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
+<a class="sourceLine" id="cb3-13" title="13">          <span class="dt">strip.text.y =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">13</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
+<a class="sourceLine" id="cb3-14" title="14">          <span class="dt">strip.background =</span> <span class="kw">element_rect</span>(<span class="dt">fill =</span> <span class="st">&quot;grey93&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;New Comic Book Characters Introduced Per Year&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">lineheight =</span> <span class="fl">.8</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>),</a>
+<a class="sourceLine" id="cb3-17" title="17">          <span class="dt">axis.title.x =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb3-18" title="18">          <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">plot.background =</span> <span class="kw">element_rect</span>(<span class="dt">fill=</span><span class="st">&quot;grey93&quot;</span>),</a>
+<a class="sourceLine" id="cb3-20" title="20">          <span class="dt">panel.grid.major =</span> <span class="kw">element_line</span>(<span class="dt">color=</span><span class="st">&quot;grey&quot;</span>),</a>
+<a class="sourceLine" id="cb3-21" title="21">          <span class="dt">panel.grid.minor =</span> <span class="kw">element_line</span>(<span class="dt">color=</span><span class="st">&quot;grey&quot;</span>),</a>
+<a class="sourceLine" id="cb3-22" title="22">          <span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-23" title="23"><span class="st">    </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">breaks=</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">500</span>,<span class="dv">100</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-25" title="25"><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">c</span>(<span class="dv">1940</span>,<span class="dv">1960</span>,<span class="dv">1980</span>,<span class="dv">2000</span>),</a>
+<a class="sourceLine" id="cb3-26" title="26">                   <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;1940&quot;</span>,<span class="st">&quot;&#39;60&quot;</span>,<span class="st">&quot;&#39;80&quot;</span>,<span class="st">&quot;2000&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb3-27" title="27"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid.minor.y =</span> <span class="kw">element_blank</span>(), <span class="dt">panel.grid.minor.x =</span> <span class="kw">element_blank</span>())</a></code></pre></div>
 <pre><code>## Warning: Removed 884 rows containing non-finite values (stat_count).</code></pre>
 <p><img src="visual_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>I learned after the fact that fivethrityeight has its own theme that I could have (should have) used instead of recreating the theme by hand, but here we are!</p>

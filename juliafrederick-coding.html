@@ -453,7 +453,7 @@ div.tocify {
       <a href="./visual.html">Visualisation</a>
     </li>
     <li>
-      <a href="./tidytues.hteml">TidyTuesday1</a>
+      <a href="./tidytues.html">TidyTuesday1</a>
     </li>
   </ul>
 </li>
@@ -484,11 +484,16 @@ div.tocify {
 
 <div id="loading-and-checking-data" class="section level2">
 <h2>Loading and checking data</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(dslabs) <span class="co">#loading packages</span></a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">data</span>(<span class="st">&quot;gapminder&quot;</span>) <span class="co">#loading data file</span></a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="co">#help(&quot;gapminder&quot;) #see what the data file contains</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(dslabs) <span class="co">#loading packages</span></a></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dslabs&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:modelr&#39;:
+## 
+##     heights</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">data</span>(<span class="st">&quot;gapminder&quot;</span>) <span class="co">#loading data file</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="co">#help(&quot;gapminder&quot;) #see what the data file contains</span></a></code></pre></div>
 <p>The gapminder dataset includes health and income outcomes for 185 countries from 1960 to 2016. Has two associated vectors, <em>oecd</em> and <em>opec</em>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">str</span>(gapminder) <span class="co">#shows the different variables, their class, a subset of the values associated, and how many lvls(if app)</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">str</span>(gapminder) <span class="co">#shows the different variables, their class, a subset of the values associated, and how many lvls(if app)</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    10545 obs. of  9 variables:
 ##  $ country         : Factor w/ 185 levels &quot;Albania&quot;,&quot;Algeria&quot;,..: 1 2 3 4 5 6 7 8 9 10 ...
 ##  $ year            : int  1960 1960 1960 1960 1960 1960 1960 1960 1960 1960 ...
@@ -499,7 +504,7 @@ div.tocify {
 ##  $ gdp             : num  NA 1.38e+10 NA NA 1.08e+11 ...
 ##  $ continent       : Factor w/ 5 levels &quot;Africa&quot;,&quot;Americas&quot;,..: 4 1 1 2 2 3 2 5 4 3 ...
 ##  $ region          : Factor w/ 22 levels &quot;Australia and New Zealand&quot;,..: 19 11 10 2 15 21 2 1 22 21 ...</code></pre>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">summary</span>(gapminder) <span class="co"># gives summary information for each variable </span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">summary</span>(gapminder) <span class="co"># gives summary information for each variable </span></a></code></pre></div>
 <pre><code>##                 country           year      infant_mortality
 ##  Albania            :   57   Min.   :1960   Min.   :  1.50  
 ##  Algeria            :   57   1st Qu.:1974   1st Qu.: 16.00  
@@ -524,15 +529,15 @@ div.tocify {
 ##  Oceania : 684   South America  : 684  
 ##                  Southern Europe: 684  
 ##                  (Other)        :5586</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">                    <span class="co">#(if numeric-mean/median/etc; if character gives the number contained per level)</span></a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw">class</span>(gapminder) <span class="co"># checks what type of object gapminder is -- &quot;data.frame&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">                    <span class="co">#(if numeric-mean/median/etc; if character gives the number contained per level)</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw">class</span>(gapminder) <span class="co"># checks what type of object gapminder is -- &quot;data.frame&quot;</span></a></code></pre></div>
 <pre><code>## [1] &quot;data.frame&quot;</code></pre>
 </div>
 <div id="procesing-data" class="section level2">
 <h2>Procesing data</h2>
 <p>Creating a dataframe with only countries in the African continent</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">africadata &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, continent <span class="op">==</span><span class="st"> &quot;Africa&quot;</span>) <span class="co"># subsetting all data associated with the contient &quot;Africa&quot;</span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="kw">str</span>(africadata) <span class="co"># checking the data included in this df, 2907 obs of 9 variables</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">africadata &lt;-<span class="st"> </span><span class="kw">subset</span>(gapminder, continent <span class="op">==</span><span class="st"> &quot;Africa&quot;</span>) <span class="co"># subsetting all data associated with the contient &quot;Africa&quot;</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="kw">str</span>(africadata) <span class="co"># checking the data included in this df, 2907 obs of 9 variables</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    2907 obs. of  9 variables:
 ##  $ country         : Factor w/ 185 levels &quot;Albania&quot;,&quot;Algeria&quot;,..: 2 3 18 22 26 27 29 31 32 33 ...
 ##  $ year            : int  1960 1960 1960 1960 1960 1960 1960 1960 1960 1960 ...
@@ -543,7 +548,7 @@ div.tocify {
 ##  $ gdp             : num  1.38e+10 NA 6.22e+08 1.24e+08 5.97e+08 ...
 ##  $ continent       : Factor w/ 5 levels &quot;Africa&quot;,&quot;Americas&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ region          : Factor w/ 22 levels &quot;Australia and New Zealand&quot;,..: 11 10 20 17 20 5 10 20 10 10 ...</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">summary</span>(africadata) <span class="co"># summary information of all the variables</span></a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">summary</span>(africadata) <span class="co"># summary information of all the variables</span></a></code></pre></div>
 <pre><code>##          country          year      infant_mortality life_expectancy
 ##  Algeria     :  57   Min.   :1960   Min.   : 11.40   Min.   :13.20  
 ##  Angola      :  57   1st Qu.:1974   1st Qu.: 62.20   1st Qu.:48.23  
@@ -569,20 +574,20 @@ div.tocify {
 ##  Australia and New Zealand:  0  
 ##  (Other)                  :  0</code></pre>
 <p>Breaking down the African dataset into smaller subsets</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co">#creating a new data frame, and naming the columns</span></a>
-<a class="sourceLine" id="cb12-2" title="2">lifecycle &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">infant_mortality =</span> africadata<span class="op">$</span>infant_mortality, <span class="dt">life_expectancy =</span> africadata<span class="op">$</span>life_expectancy)</a>
-<a class="sourceLine" id="cb12-3" title="3"><span class="co">#creating a new data frame, and naming the columns</span></a>
-<a class="sourceLine" id="cb12-4" title="4">poplife &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">population =</span> africadata<span class="op">$</span>population, <span class="dt">life_expectancy =</span> africadata<span class="op">$</span>life_expectancy)</a>
-<a class="sourceLine" id="cb12-5" title="5"></a>
-<a class="sourceLine" id="cb12-6" title="6"><span class="kw">str</span>(lifecycle) <span class="co">#2907 obs of 2 variables</span></a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co">#creating a new data frame, and naming the columns</span></a>
+<a class="sourceLine" id="cb15-2" title="2">lifecycle &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">infant_mortality =</span> africadata<span class="op">$</span>infant_mortality, <span class="dt">life_expectancy =</span> africadata<span class="op">$</span>life_expectancy)</a>
+<a class="sourceLine" id="cb15-3" title="3"><span class="co">#creating a new data frame, and naming the columns</span></a>
+<a class="sourceLine" id="cb15-4" title="4">poplife &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">population =</span> africadata<span class="op">$</span>population, <span class="dt">life_expectancy =</span> africadata<span class="op">$</span>life_expectancy)</a>
+<a class="sourceLine" id="cb15-5" title="5"></a>
+<a class="sourceLine" id="cb15-6" title="6"><span class="kw">str</span>(lifecycle) <span class="co">#2907 obs of 2 variables</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    2907 obs. of  2 variables:
 ##  $ infant_mortality: num  148 208 187 116 161 ...
 ##  $ life_expectancy : num  47.5 36 38.3 50.3 35.2 ...</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">str</span>(poplife) <span class="co">#2907 obs of 2 variables</span></a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="kw">str</span>(poplife) <span class="co">#2907 obs of 2 variables</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    2907 obs. of  2 variables:
 ##  $ population     : num  11124892 5270844 2431620 524029 4829291 ...
 ##  $ life_expectancy: num  47.5 36 38.3 50.3 35.2 ...</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">summary</span>(lifecycle) <span class="co">#averages of infant mortality and life expectancy</span></a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="kw">summary</span>(lifecycle) <span class="co">#averages of infant mortality and life expectancy</span></a></code></pre></div>
 <pre><code>##  infant_mortality life_expectancy
 ##  Min.   : 11.40   Min.   :13.20  
 ##  1st Qu.: 62.20   1st Qu.:48.23  
@@ -591,7 +596,7 @@ div.tocify {
 ##  3rd Qu.:124.70   3rd Qu.:60.10  
 ##  Max.   :237.40   Max.   :77.60  
 ##  NA&#39;s   :226</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="kw">summary</span>(poplife) <span class="co">#averages of population and life expectancy</span></a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="kw">summary</span>(poplife) <span class="co">#averages of population and life expectancy</span></a></code></pre></div>
 <pre><code>##    population        life_expectancy
 ##  Min.   :    41538   Min.   :13.20  
 ##  1st Qu.:  1605232   1st Qu.:48.23  
@@ -604,30 +609,30 @@ div.tocify {
 <div id="plotting" class="section level2">
 <h2>Plotting</h2>
 <p>Plot life expectancy as a function of infant mortality</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
-<a class="sourceLine" id="cb20-2" title="2"><span class="kw">plot</span>(lifecycle<span class="op">$</span>infant_mortality, lifecycle<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Infant Mortality&quot;</span>,</a>
-<a class="sourceLine" id="cb20-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy as a function of infant mortality&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="kw">plot</span>(lifecycle<span class="op">$</span>infant_mortality, lifecycle<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Infant Mortality&quot;</span>,</a>
+<a class="sourceLine" id="cb23-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy as a function of infant mortality&quot;</span>)</a></code></pre></div>
 <p><img src="juliafrederick-coding_files/figure-html/unnamed-chunk-5-1.png" width="672" /> A negative correlation between infant mortality and life expectancy</p>
 <p>Plot life expectancy as a function of populaiton size</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
-<a class="sourceLine" id="cb21-2" title="2"><span class="kw">plot</span>(<span class="kw">log</span>(poplife<span class="op">$</span>population), poplife<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Log of Population Size&quot;</span>, </a>
-<a class="sourceLine" id="cb21-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy as a function of population&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="kw">plot</span>(<span class="kw">log</span>(poplife<span class="op">$</span>population), poplife<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Log of Population Size&quot;</span>, </a>
+<a class="sourceLine" id="cb24-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy as a function of population&quot;</span>)</a></code></pre></div>
 <p><img src="juliafrederick-coding_files/figure-html/unnamed-chunk-6-1.png" width="672" /> This plot shows a slight positive correlation overall for this data set. However, there are streaks of data which are likely all from the same country just with the growing population size overtime.</p>
 </div>
 <div id="more-data-processing" class="section level2">
 <h2>More data processing</h2>
 <p>Finding what years have NAs for infant mortality</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">yrNA&lt;-<span class="kw">data.frame</span>() <span class="co">#create an empty data frame that can be added on to later</span></a>
-<a class="sourceLine" id="cb22-2" title="2"><span class="co">#create a for loop to go through all years in the data set</span></a>
-<a class="sourceLine" id="cb22-3" title="3"><span class="co">#count the number of TRUE meaning there is an NA present in which year</span></a>
-<a class="sourceLine" id="cb22-4" title="4"><span class="co">#add year and number of NAs present in the empty data frame</span></a>
-<a class="sourceLine" id="cb22-5" title="5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1960</span><span class="op">:</span><span class="dv">2016</span>){</a>
-<a class="sourceLine" id="cb22-6" title="6">  x&lt;-<span class="kw">sum</span>(<span class="kw">is.na</span>(africadata<span class="op">$</span>infant_mortality[<span class="kw">which</span>(africadata<span class="op">$</span>year<span class="op">==</span>i)]))</a>
-<a class="sourceLine" id="cb22-7" title="7">  yrNA &lt;-<span class="st"> </span><span class="kw">rbind</span>(yrNA,<span class="kw">c</span>(i,x))</a>
-<a class="sourceLine" id="cb22-8" title="8">}</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">yrNA&lt;-<span class="kw">data.frame</span>() <span class="co">#create an empty data frame that can be added on to later</span></a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="co">#create a for loop to go through all years in the data set</span></a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="co">#count the number of TRUE meaning there is an NA present in which year</span></a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="co">#add year and number of NAs present in the empty data frame</span></a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1960</span><span class="op">:</span><span class="dv">2016</span>){</a>
+<a class="sourceLine" id="cb25-6" title="6">  x&lt;-<span class="kw">sum</span>(<span class="kw">is.na</span>(africadata<span class="op">$</span>infant_mortality[<span class="kw">which</span>(africadata<span class="op">$</span>year<span class="op">==</span>i)]))</a>
+<a class="sourceLine" id="cb25-7" title="7">  yrNA &lt;-<span class="st"> </span><span class="kw">rbind</span>(yrNA,<span class="kw">c</span>(i,x))</a>
+<a class="sourceLine" id="cb25-8" title="8">}</a></code></pre></div>
 <p>Creating a new data frame for only the year 2000 in Africa</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">africa2000 &lt;-<span class="st"> </span><span class="kw">subset</span>(africadata, year <span class="op">==</span><span class="st"> &quot;2000&quot;</span>) <span class="co">#subsetting the data to only yr2000</span></a>
-<a class="sourceLine" id="cb23-2" title="2"><span class="kw">summary</span>(africa2000) <span class="co">#summary statistics of all variables</span></a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">africa2000 &lt;-<span class="st"> </span><span class="kw">subset</span>(africadata, year <span class="op">==</span><span class="st"> &quot;2000&quot;</span>) <span class="co">#subsetting the data to only yr2000</span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="kw">summary</span>(africa2000) <span class="co">#summary statistics of all variables</span></a></code></pre></div>
 <pre><code>##          country        year      infant_mortality life_expectancy
 ##  Algeria     : 1   Min.   :2000   Min.   : 12.30   Min.   :37.60  
 ##  Angola      : 1   1st Qu.:2000   1st Qu.: 60.80   1st Qu.:51.75  
@@ -652,7 +657,7 @@ div.tocify {
 ##  Southern Africa          : 5  
 ##  Australia and New Zealand: 0  
 ##  (Other)                  : 0</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw">str</span>(africa2000) <span class="co">#information on all the variables in the dataframe</span></a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">str</span>(africa2000) <span class="co">#information on all the variables in the dataframe</span></a></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    51 obs. of  9 variables:
 ##  $ country         : Factor w/ 185 levels &quot;Albania&quot;,&quot;Algeria&quot;,..: 2 3 18 22 26 27 29 31 32 33 ...
 ##  $ year            : int  2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 ...
@@ -667,21 +672,21 @@ div.tocify {
 <div id="more-plotting" class="section level2">
 <h2>More plotting</h2>
 <p>Recreating previous plots with only data from the year 2000 in Africa</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="kw">plot</span>(africa2000<span class="op">$</span>infant_mortality, africa2000<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Infant Mortality&quot;</span>,</a>
-<a class="sourceLine" id="cb27-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy by infant mortality in 2000&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1"><span class="co">#plot(x value, y value, x-axis label, y-axis label, main title)</span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="kw">plot</span>(africa2000<span class="op">$</span>infant_mortality, africa2000<span class="op">$</span>life_expectancy, <span class="dt">xlab=</span><span class="st">&quot;Infant Mortality&quot;</span>,</a>
+<a class="sourceLine" id="cb30-3" title="3">     <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Life expectancy by infant mortality in 2000&quot;</span>)</a></code></pre></div>
 <p><img src="juliafrederick-coding_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">plot</span>(<span class="kw">log</span>(africa2000<span class="op">$</span>population), africa2000<span class="op">$</span>life_expectancy, </a>
-<a class="sourceLine" id="cb28-2" title="2">     <span class="dt">xlab=</span><span class="st">&quot;Log of Population Size&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>,</a>
-<a class="sourceLine" id="cb28-3" title="3">     <span class="dt">main=</span><span class="st">&quot;Life expectancy by population in 2000&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="kw">plot</span>(<span class="kw">log</span>(africa2000<span class="op">$</span>population), africa2000<span class="op">$</span>life_expectancy, </a>
+<a class="sourceLine" id="cb31-2" title="2">     <span class="dt">xlab=</span><span class="st">&quot;Log of Population Size&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Life Expectancy&quot;</span>,</a>
+<a class="sourceLine" id="cb31-3" title="3">     <span class="dt">main=</span><span class="st">&quot;Life expectancy by population in 2000&quot;</span>)</a></code></pre></div>
 <p><img src="juliafrederick-coding_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
 </div>
 <div id="a-simple-fit" class="section level2">
 <h2>A simple fit</h2>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="co">#fitting a linear model to infant mortality and life expectancy</span></a>
-<a class="sourceLine" id="cb29-2" title="2"><span class="co">#lm(response~terms) - where terms means predictors</span></a>
-<a class="sourceLine" id="cb29-3" title="3">fit1 &lt;-<span class="st"> </span><span class="kw">lm</span>(africa2000<span class="op">$</span>life_expectancy <span class="op">~</span><span class="st"> </span>africa2000<span class="op">$</span>infant_mortality)</a>
-<a class="sourceLine" id="cb29-4" title="4"><span class="kw">summary</span>(fit1)</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="co">#fitting a linear model to infant mortality and life expectancy</span></a>
+<a class="sourceLine" id="cb32-2" title="2"><span class="co">#lm(response~terms) - where terms means predictors</span></a>
+<a class="sourceLine" id="cb32-3" title="3">fit1 &lt;-<span class="st"> </span><span class="kw">lm</span>(africa2000<span class="op">$</span>life_expectancy <span class="op">~</span><span class="st"> </span>africa2000<span class="op">$</span>infant_mortality)</a>
+<a class="sourceLine" id="cb32-4" title="4"><span class="kw">summary</span>(fit1)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = africa2000$life_expectancy ~ africa2000$infant_mortality)
@@ -700,9 +705,9 @@ div.tocify {
 ## Residual standard error: 6.221 on 49 degrees of freedom
 ## Multiple R-squared:  0.4701, Adjusted R-squared:  0.4593 
 ## F-statistic: 43.48 on 1 and 49 DF,  p-value: 2.826e-08</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="co">#fitting a linear model to population and life expectancy</span></a>
-<a class="sourceLine" id="cb31-2" title="2">fit2 &lt;-<span class="st"> </span><span class="kw">lm</span>(africa2000<span class="op">$</span>life_expectancy <span class="op">~</span><span class="st"> </span>africa2000<span class="op">$</span>population)</a>
-<a class="sourceLine" id="cb31-3" title="3"><span class="kw">summary</span>(fit2)</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1"><span class="co">#fitting a linear model to population and life expectancy</span></a>
+<a class="sourceLine" id="cb34-2" title="2">fit2 &lt;-<span class="st"> </span><span class="kw">lm</span>(africa2000<span class="op">$</span>life_expectancy <span class="op">~</span><span class="st"> </span>africa2000<span class="op">$</span>population)</a>
+<a class="sourceLine" id="cb34-3" title="3"><span class="kw">summary</span>(fit2)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = africa2000$life_expectancy ~ africa2000$population)
