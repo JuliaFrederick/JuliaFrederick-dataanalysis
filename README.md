@@ -1,3 +1,5 @@
+# Julia Frederick's Data Analysis Exercise
+
 # Overview
 
 This is a starter template for a data analysis exercise, containing data, a codebook and an RMarkdown file.
