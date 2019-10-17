@@ -6,6 +6,14 @@ left:
       - text: "Continuous Outcome Analysis"
         href: ./Continuous_Outcome_Analysis.html
       - text: "Future Analysis"
+  - text: "Previous Projects"
+    menu:
+      - text: "Coding Exercise"
+        href: ./juliafrederick-coding.html
+      - text: "Visualisation"
+        href: ./visual.html
+      - text: "TidyTuesday1"
+        href: ./tidytues.html
   - text: "About the Author"
     href: ./Author.html
 right:

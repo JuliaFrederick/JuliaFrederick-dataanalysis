@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Julia Frederick" />
+
+
+<title>TidyTuesday1</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="customstyles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Analysis Exercise Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="./Continuous_Outcome_Analysis.html">Continuous Outcome Analysis</a>
+    </li>
+    <li class="dropdown-header">Future Analysis</li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Previous Projects
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="./juliafrederick-coding.html">Coding Exercise</a>
+    </li>
+    <li>
+      <a href="./visual.html">Visualisation</a>
+    </li>
+    <li>
+      <a href="./tidytues.hteml">TidyTuesday1</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="./Author.html">About the Author</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/epid8060fall2019/JuliaFrederick-dataanalysis">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">TidyTuesday1</h1>
+<h4 class="author">Julia Frederick</h4>
+<h4 class="date">10/3/2019</h4>
+
+</div>
+
+
+<div id="this-weeks-tidytuesday-is-on-pizza-places" class="section level3">
+<h3>This week’s TidyTuesday is on Pizza Places</h3>
+<p>Lets load in the data</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">pizza_jared &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_jared.csv&quot;</span>)</a></code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   polla_qid = col_double(),
+##   answer = col_character(),
+##   votes = col_double(),
+##   pollq_id = col_double(),
+##   question = col_character(),
+##   place = col_character(),
+##   time = col_double(),
+##   total_votes = col_double(),
+##   percent = col_double()
+## )</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">pizza_barstool &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_barstool.csv&quot;</span>)</a></code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   name = col_character(),
+##   address1 = col_character(),
+##   city = col_character(),
+##   country = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">pizza_datafiniti &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_datafiniti.csv&quot;</span>)</a></code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   name = col_character(),
+##   address = col_character(),
+##   city = col_character(),
+##   country = col_character(),
+##   province = col_character(),
+##   latitude = col_double(),
+##   longitude = col_double(),
+##   categories = col_character(),
+##   price_range_min = col_double(),
+##   price_range_max = col_double()
+## )</code></pre>
+</div>
+<div id="examine-the-data" class="section level3">
+<h3>Examine the data</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">summary</span>(pizza_datafiniti)</a></code></pre></div>
+<pre><code>##      name             address              city          
+##  Length:10000       Length:10000       Length:10000      
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+##    country            province            latitude       longitude      
+##  Length:10000       Length:10000       Min.   :21.42   Min.   :-157.80  
+##  Class :character   Class :character   1st Qu.:34.42   1st Qu.:-104.80  
+##  Mode  :character   Mode  :character   Median :40.12   Median : -82.91  
+##                                        Mean   :38.37   Mean   : -90.06  
+##                                        3rd Qu.:40.91   3rd Qu.: -75.19  
+##                                        Max.   :64.85   Max.   : -71.95  
+##   categories        price_range_min  price_range_max
+##  Length:10000       Min.   : 0.000   Min.   : 7.00  
+##  Class :character   1st Qu.: 0.000   1st Qu.:25.00  
+##  Mode  :character   Median : 0.000   Median :25.00  
+##                     Mean   : 4.655   Mean   :27.76  
+##                     3rd Qu.: 0.000   3rd Qu.:25.00  
+##                     Max.   :50.000   Max.   :55.00</code></pre>
+</div>
+<div id="load-in-the-libraries-needed" class="section level3">
+<h3>Load in the libraries needed</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
+<pre><code>## -- Attaching packages --------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   0.8.3     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="kw">library</span>(magrittr)</a></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="kw">library</span>(dplyr)</a></code></pre></div>
+</div>
+<div id="visualize-the-data" class="section level3">
+<h3>Visualize the data</h3>
+<p>How many pizza places are there per state</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">#finding out how many places serve pizza per state</span></a>
+<a class="sourceLine" id="cb19-2" title="2">pizzastate &lt;-<span class="st"> </span>pizza_datafiniti <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(province) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">npizza =</span> <span class="kw">length</span>(name))</a>
+<a class="sourceLine" id="cb19-3" title="3"></a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="co">#quick plot of pizza by state</span></a>
+<a class="sourceLine" id="cb19-5" title="5"><span class="kw">ggplot</span>(pizzastate, <span class="kw">aes</span>(<span class="dt">x=</span>province, <span class="dt">y=</span>npizza)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="st">  </span><span class="kw">geom_point</span>()</a></code></pre></div>
+<p><img src="tidytues_files/figure-html/graph%20pizza%20and%20state-1.png" width="672" /></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">summary</span>(pizzastate)</a></code></pre></div>
+<pre><code>##    province             npizza      
+##  Length:44          Min.   :   2.0  
+##  Class :character   1st Qu.:  23.5  
+##  Mode  :character   Median :  88.0  
+##                     Mean   : 227.3  
+##                     3rd Qu.: 241.8  
+##                     Max.   :2640.0</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="kw">which.max</span>(pizzastate<span class="op">$</span>npizza)</a></code></pre></div>
+<pre><code>## [1] 31</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">pizzastate<span class="op">$</span>province[<span class="dv">31</span>]</a></code></pre></div>
+<pre><code>## [1] &quot;NY&quot;</code></pre>
+</div>
+<div id="new-york-has-a-lot-of-pizza-places" class="section level3">
+<h3>New York has a lot of pizza places!</h3>
+<p>It has 2640 pizza places - lets look more at those</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">nypizza &lt;-<span class="st"> </span><span class="kw">subset</span>(pizza_datafiniti, province <span class="op">==</span><span class="st"> &quot;NY&quot;</span>)</a></code></pre></div>
+<p>Some places appear to be duplicated, lets keep only those that are unique</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="co">#number of times a place is listed</span></a>
+<a class="sourceLine" id="cb27-2" title="2">chain &lt;-<span class="st"> </span>nypizza <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(name) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">nlocations =</span> <span class="kw">length</span>(latitude))</a>
+<a class="sourceLine" id="cb27-3" title="3"><span class="co">#joining previous table to current</span></a>
+<a class="sourceLine" id="cb27-4" title="4">nypizza <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(.,chain)</a></code></pre></div>
+<pre><code>## Joining, by = &quot;name&quot;</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="co">#each address is only listed once now</span></a>
+<a class="sourceLine" id="cb29-2" title="2">unchain &lt;-<span class="st"> </span><span class="kw">distinct</span>(nypizza, address, <span class="dt">.keep_all =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<p>Are they evenly distributed?</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">NYcities &lt;-<span class="st"> </span>unchain <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(city) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">npp =</span> <span class="kw">length</span>(latitude))</a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="kw">ggplot</span>(NYcities) <span class="op">+</span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x=</span>npp))</a></code></pre></div>
+<p><img src="tidytues_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>No, one city appears to have way more than the others</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="kw">which.max</span>(NYcities<span class="op">$</span>npp)</a></code></pre></div>
+<pre><code>## [1] 92</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">NYcities<span class="op">$</span>city[<span class="dv">92</span>]</a></code></pre></div>
+<pre><code>## [1] &quot;New York&quot;</code></pre>
+</div>
+<div id="new-york-city-has-the-most-no-surprise-there." class="section level3">
+<h3>New York City has the most, no surprise there.</h3>
+<p>The <code>pizza_barstool</code> dataset looks specifically at New York City so let’s switch to there</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">summary</span>(pizza_barstool)</a></code></pre></div>
+<pre><code>##      name             address1             city                zip       
+##  Length:463         Length:463         Length:463         Min.   : 1748  
+##  Class :character   Class :character   Class :character   1st Qu.:10009  
+##  Mode  :character   Mode  :character   Mode  :character   Median :10019  
+##                                                           Mean   :18531  
+##                                                           3rd Qu.:11234  
+##                                                           Max.   :94133  
+##                                                                          
+##    country             latitude       longitude        price_level  
+##  Length:463         Min.   :25.79   Min.   :-122.41   Min.   :0.00  
+##  Class :character   1st Qu.:40.72   1st Qu.: -74.09   1st Qu.:1.00  
+##  Mode  :character   Median :40.75   Median : -73.99   Median :1.00  
+##                     Mean   :40.19   Mean   : -77.44   Mean   :1.46  
+##                     3rd Qu.:40.78   3rd Qu.: -73.97   3rd Qu.:2.00  
+##                     Max.   :45.00   Max.   : -70.09   Max.   :3.00  
+##                     NA&#39;s   :2       NA&#39;s   :2                       
+##  provider_rating provider_review_count review_stats_all_average_score
+##  Min.   :2.000   Min.   :   2.0        Min.   :0.100                 
+##  1st Qu.:3.500   1st Qu.:  74.0        1st Qu.:6.240                 
+##  Median :3.500   Median : 169.0        Median :7.162                 
+##  Mean   :3.671   Mean   : 386.1        Mean   :6.876                 
+##  3rd Qu.:4.000   3rd Qu.: 392.0        3rd Qu.:7.809                 
+##  Max.   :5.000   Max.   :5797.0        Max.   :9.079                 
+##                                                                      
+##  review_stats_all_count review_stats_all_total_score
+##  Min.   :  1.00         Min.   :   0.10             
+##  1st Qu.:  4.00         1st Qu.:  23.65             
+##  Median :  8.00         Median :  54.10             
+##  Mean   : 19.02         Mean   : 149.93             
+##  3rd Qu.: 19.00         3rd Qu.: 140.20             
+##  Max.   :568.00         Max.   :5045.60             
+##                                                     
+##  review_stats_community_average_score review_stats_community_count
+##  Min.   : 0.000                       Min.   :  0.00              
+##  1st Qu.: 6.075                       1st Qu.:  3.00              
+##  Median : 7.225                       Median :  7.00              
+##  Mean   : 6.457                       Mean   : 17.87              
+##  3rd Qu.: 7.873                       3rd Qu.: 18.00              
+##  Max.   :10.000                       Max.   :567.00              
+##                                                                   
+##  review_stats_community_total_score review_stats_critic_average_score
+##  Min.   :   0.00                    Min.   : 0.0000                  
+##  1st Qu.:  15.65                    1st Qu.: 0.0000                  
+##  Median :  47.30                    Median : 0.0000                  
+##  Mean   : 142.28                    Mean   : 0.9717                  
+##  3rd Qu.: 135.10                    3rd Qu.: 0.0000                  
+##  Max.   :5036.30                    Max.   :11.0000                  
+##                                                                      
+##  review_stats_critic_count review_stats_critic_total_score
+##  Min.   :0.0000            Min.   : 0.000                 
+##  1st Qu.:0.0000            1st Qu.: 0.000                 
+##  Median :0.0000            Median : 0.000                 
+##  Mean   :0.1425            Mean   : 1.023                 
+##  3rd Qu.:0.0000            3rd Qu.: 0.000                 
+##  Max.   :5.0000            Max.   :29.800                 
+##                                                           
+##  review_stats_dave_average_score review_stats_dave_count
+##  Min.   : 0.080                  Min.   :1              
+##  1st Qu.: 6.200                  1st Qu.:1              
+##  Median : 7.100                  Median :1              
+##  Mean   : 6.623                  Mean   :1              
+##  3rd Qu.: 7.800                  3rd Qu.:1              
+##  Max.   :10.000                  Max.   :1              
+##                                                         
+##  review_stats_dave_total_score
+##  Min.   : 0.080               
+##  1st Qu.: 6.200               
+##  Median : 7.100               
+##  Mean   : 6.623               
+##  3rd Qu.: 7.800               
+##  Max.   :10.000               
+## </code></pre>
+<p>What is the average rating of a pizza place in NYC</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="kw">summary</span>(pizza_barstool<span class="op">$</span>review_stats_dave_average_score)</a></code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.080   6.200   7.100   6.623   7.800  10.000</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1"><span class="kw">ggplot</span>(pizza_barstool) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-2" title="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x=</span>review_stats_dave_average_score)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-3" title="3"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Distribution of pizza ratings in New York City&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-4" title="4"><span class="st">      </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">lineheight =</span> <span class="fl">.8</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-5" title="5"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Average Review Rating from Dave&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-6" title="6"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Number of places with that score&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-7" title="7"><span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="fl">6.623</span>, <span class="dt">color =</span> <span class="st">&quot;red&quot;</span>)</a></code></pre></div>
+<p><img src="tidytues_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>For those that are “Above Average” what is the price level?</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">aboveavg &lt;-<span class="st"> </span><span class="kw">subset</span>(pizza_barstool, review_stats_dave_average_score <span class="op">&gt;=</span><span class="st"> </span><span class="fl">6.623</span>)</a>
+<a class="sourceLine" id="cb40-2" title="2"></a>
+<a class="sourceLine" id="cb40-3" title="3"><span class="kw">ggplot</span>(aboveavg) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-4" title="4"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">x=</span>review_stats_dave_average_score)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-5" title="5"><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Distribution of ABOVE AVERAGE pizza ratings by</span><span class="ch">\n</span><span class="st"> price level in New York City&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-6" title="6"><span class="st">      </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">lineheight =</span> <span class="fl">.8</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb40-7" title="7"><span class="st">  </span><span class="kw">facet_grid</span>(.<span class="op">~</span>price_level) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-8" title="8"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Average Review Rating from Dave&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb40-9" title="9"><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;Number of places with that score&quot;</span>) </a></code></pre></div>
+<p><img src="tidytues_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
