@@ -1,0 +1,9 @@
+---
+title: "About the author"
+output: 
+  html_document:
+    toc: FALSE
+---
+
+If you want to learn more about me, Julia Frederick, you can visit [this website](https://epid8060fall2019.github.io/juliaFrederick-introduction/).
+

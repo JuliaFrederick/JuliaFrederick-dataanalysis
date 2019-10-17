@@ -1,5 +1,7 @@
 # Julia Frederick's Data Analysis Exercise
 
+https://epid8060fall2019.github.io/JuliaFrederick-dataanalysis/
+
 # Overview
 
 This is a starter template for a data analysis exercise, containing data, a codebook and an RMarkdown file.
