@@ -6,6 +6,7 @@ left:
       - text: "Continuous Outcome Analysis"
         href: ./Continuous_Outcome_Analysis.html
       - text: "Future Analysis"
+        href: ./Variable_Selection.html
   - text: "Previous Projects"
     menu:
       - text: "Coding Exercise"
