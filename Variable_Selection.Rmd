@@ -290,7 +290,7 @@ For accuracy, the simplest null model always predicts the most frequent category
 ```{r nullmodel-acc}
 #write code that computes accuracy for a null model
 #the null model always predicts "No"
-measureACC("No", d$gg2c4)
+mlr::measureACC("No", d$gg2c4)
 ```
 
 You should find that the null model has an accuracy of around 0.69.
@@ -402,23 +402,26 @@ Using this approach, a model is evaluated based on the Area under the curve (AUC
 #the null model always predicts "No"
 #the auc function in the pROC package is useful
 #or you can use any other package/function you want to use to compute AUC/ROC
-mean(auc(as.numeric(d$gg2c4), as.ordered(d$Action1)),
-auc(as.numeric(d$gg2c4), d$CasesAll),
-auc(as.numeric(d$gg2c4), as.ordered(d$Country)),
-auc(as.numeric(d$gg2c4), d$Deaths),
-auc(as.numeric(d$gg2c4), as.ordered(d$Hemisphere)),
-auc(as.numeric(d$gg2c4), d$Hospitalizations),
-auc(as.numeric(d$gg2c4), d$MeanD1),
-auc(as.numeric(d$gg2c4), d$MeanI1),
-auc(as.numeric(d$gg2c4), d$MedianD1),
-auc(as.numeric(d$gg2c4), d$MedianI1),
-auc(as.numeric(d$gg2c4), as.ordered(d$OBYear)),
-auc(as.numeric(d$gg2c4), as.ordered(d$Path1)),
-auc(as.numeric(d$gg2c4), d$RiskAll),
-auc(as.numeric(d$gg2c4), as.ordered(d$season)),
-auc(as.numeric(d$gg2c4), as.ordered(d$Trans1)),
-auc(as.numeric(d$gg2c4), d$Vomit),
-auc(as.numeric(d$gg2c4), as.ordered(d$Setting)))
+
+auc(roc(d$gg2c4, rep(1,850))) #doing for each 
+
+#mean(auc(as.numeric(d$gg2c4), as.ordered(d$Action1)),
+#auc(as.numeric(d$gg2c4), d$CasesAll),
+#auc(as.numeric(d$gg2c4), as.ordered(d$Country)),
+#auc(as.numeric(d$gg2c4), d$Deaths),
+#auc(as.numeric(d$gg2c4), as.ordered(d$Hemisphere)),
+#auc(as.numeric(d$gg2c4), d$Hospitalizations),
+#auc(as.numeric(d$gg2c4), d$MeanD1),
+#auc(as.numeric(d$gg2c4), d$MeanI1),
+#auc(as.numeric(d$gg2c4), d$MedianD1),
+#auc(as.numeric(d$gg2c4), d$MedianI1),
+#auc(as.numeric(d$gg2c4), as.ordered(d$OBYear)),
+#auc(as.numeric(d$gg2c4), as.ordered(d$Path1)),
+#auc(as.numeric(d$gg2c4), d$RiskAll),
+#auc(as.numeric(d$gg2c4), as.ordered(d$season)),
+#auc(as.numeric(d$gg2c4), as.ordered(d$Trans1)),
+#auc(as.numeric(d$gg2c4), d$Vomit),
+#auc(as.numeric(d$gg2c4), as.ordered(d$Setting)))
 
 ```
 

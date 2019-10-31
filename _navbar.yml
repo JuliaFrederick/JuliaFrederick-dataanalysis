@@ -5,8 +5,10 @@ left:
     menu:
       - text: "Continuous Outcome Analysis"
         href: ./Continuous_Outcome_Analysis.html
-      - text: "Future Analysis"
+      - text: "Variable Analysis"
         href: ./Variable_Selection.html
+      - text: "Tree Fitting"
+        href: ./Tree_Fitting.html
   - text: "Previous Projects"
     menu:
       - text: "Coding Exercise"

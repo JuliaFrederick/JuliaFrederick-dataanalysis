@@ -434,7 +434,10 @@ div.tocify {
       <a href="./Continuous_Outcome_Analysis.html">Continuous Outcome Analysis</a>
     </li>
     <li>
-      <a href="./Variable_Selection.html">Future Analysis</a>
+      <a href="./Variable_Selection.html">Variable Analysis</a>
+    </li>
+    <li>
+      <a href="./Tree_Fitting.html">Tree Fitting</a>
     </li>
   </ul>
 </li>
@@ -493,21 +496,12 @@ div.tocify {
 <a class="sourceLine" id="cb1-3" title="3"><span class="kw">library</span>(<span class="st">&#39;forcats&#39;</span>)</a>
 <a class="sourceLine" id="cb1-4" title="4"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)</a>
 <a class="sourceLine" id="cb1-5" title="5"><span class="kw">library</span>(<span class="st">&#39;knitr&#39;</span>)</a>
-<a class="sourceLine" id="cb1-6" title="6"><span class="kw">library</span>(<span class="st">&#39;mlr&#39;</span>) <span class="co">#for model fitting.</span></a></code></pre></div>
-<pre><code>## Loading required package: ParamHelpers</code></pre>
-<pre><code>## 
-## Attaching package: &#39;mlr&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:modelr&#39;:
-## 
-##     resample</code></pre>
-<pre><code>## The following object is masked from &#39;package:caret&#39;:
-## 
-##     train</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">library</span>(<span class="st">&#39;parallelMap&#39;</span>) <span class="co">#for using multiple processors when running models through mlr</span></a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw">library</span>(<span class="st">&#39;visdat&#39;</span>) </a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="kw">library</span>(<span class="st">&#39;miscset&#39;</span>) <span class="co">#for ggplot grid</span></a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="kw">library</span>(<span class="st">&#39;arsenal&#39;</span>) <span class="co">#for summary table</span></a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="kw">library</span>(<span class="st">&#39;pROC&#39;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-6" title="6"><span class="kw">library</span>(<span class="st">&#39;mlr&#39;</span>) <span class="co">#for model fitting.</span></a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="kw">library</span>(<span class="st">&#39;parallelMap&#39;</span>) <span class="co">#for using multiple processors when running models through mlr</span></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="kw">library</span>(<span class="st">&#39;visdat&#39;</span>) </a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="kw">library</span>(<span class="st">&#39;miscset&#39;</span>) <span class="co">#for ggplot grid</span></a>
+<a class="sourceLine" id="cb1-10" title="10"><span class="kw">library</span>(<span class="st">&#39;arsenal&#39;</span>) <span class="co">#for summary table</span></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="kw">library</span>(<span class="st">&#39;pROC&#39;</span>)</a></code></pre></div>
 <pre><code>## Type &#39;citation(&quot;pROC&quot;)&#39; for a citation.</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;pROC&#39;</code></pre>
@@ -518,46 +512,46 @@ div.tocify {
 <div id="data-loading-and-cleaning" class="section level1">
 <h1>Data loading and cleaning</h1>
 <p>We will again use the Norovirus dataset.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co">#Write code that loads the dataset </span></a>
-<a class="sourceLine" id="cb10-2" title="2">data_raw &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;./norodata.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co">#Write code that loads the dataset </span></a>
+<a class="sourceLine" id="cb5-2" title="2">data_raw &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;./norodata.csv&quot;</span>)</a></code></pre></div>
 </div>
 <div id="looking-at-the-outcome" class="section level1">
 <h1>Looking at the outcome</h1>
 <p>For this analysis, our main outcome of interest is if an outbreak was caused by the G2.4 strain of norovirus or not, and how other factors might be correlated with that strain.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co">#write code to take a look at the outcome variable (gg2c4)</span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="kw">summary</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">#write code to take a look at the outcome variable (gg2c4)</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">summary</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
 <pre><code>##     Yes 
 ## 716 306</code></pre>
 <p>Overall, it looks ok, a decent amouut in each category (i.e. no unbalanced data). However, we see an odd coding, there are only 2 types of entries, either “Yes” or "“, i.e. an empty space. The codebook tells us that this is how things were coded, if it was G2.4 it got a”Yes“, if it wasn’t it did get an empty space instead of a”No“. That’s somewhat strange and while the analysis should work, it is better to re-code the empty slots with”No".</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="co">#write code to change the empty values in gg2c4 to &quot;No&quot;</span></a>
-<a class="sourceLine" id="cb13-2" title="2"><span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">#write code to change the empty values in gg2c4 to &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
 <pre><code>## [1] &quot;&quot;    &quot;Yes&quot;</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)[<span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)<span class="op">==</span><span class="st">&quot;&quot;</span>]&lt;-<span class="st">&quot;No&quot;</span></a>
-<a class="sourceLine" id="cb15-2" title="2"><span class="kw">summary</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)[<span class="kw">levels</span>(data_raw<span class="op">$</span>gg2c4)<span class="op">==</span><span class="st">&quot;&quot;</span>]&lt;-<span class="st">&quot;No&quot;</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="kw">summary</span>(data_raw<span class="op">$</span>gg2c4)</a></code></pre></div>
 <pre><code>##  No Yes 
 ## 716 306</code></pre>
 </div>
 <div id="selecting-predictors" class="section level1">
 <h1>Selecting predictors</h1>
 <p>We will pick similar variables as previously, with some adjustments based on what we learned before. Keep the following variables: <code>Action1, CasesAll, Country, Deaths, GG2C4, Hemisphere, Hospitalizations,  MeanD1, MeanI1, MedianD1, MedianI1, OBYear, Path1, RiskAll, Season, Setting, Trans1, Vomit.</code></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">d &lt;-<span class="st"> </span>data_raw <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(Action1, CasesAll, Country, Deaths, gg2c4, Hemisphere, Hospitalizations,  MeanD1, MeanI1, MedianD1, MedianI1, OBYear, Path1, RiskAll, season, Setting_<span class="dv">1</span>, Trans1, Vomit)</a>
-<a class="sourceLine" id="cb17-2" title="2"><span class="kw">dim</span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">d &lt;-<span class="st"> </span>data_raw <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(Action1, CasesAll, Country, Deaths, gg2c4, Hemisphere, Hospitalizations,  MeanD1, MeanI1, MedianD1, MedianI1, OBYear, Path1, RiskAll, season, Setting_<span class="dv">1</span>, Trans1, Vomit)</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">dim</span>(d)</a></code></pre></div>
 <pre><code>## [1] 1022   18</code></pre>
 </div>
 <div id="cleaning-predictors" class="section level1">
 <h1>Cleaning predictors</h1>
 <p>We’ll likely have to perform similar cleaning steps as before. A difference is that earlier we had to drop about half of the observations because no outcome was available. Here, we have outcome for every outbreak. Thus, there is more data to clean, which - as we will see - introduces a few issues we didn’t have before, since we dropped the troublesome observations early in the process.</p>
 <p>Let’s first check for missing values.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># write code that looks at missing values</span></a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="kw">vis_miss</span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="co"># write code that looks at missing values</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="kw">vis_miss</span>(d)</a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/check-reduced-data-1.png" width="672" /></p>
 <p>Looks like we have again some missing in <code>Hospitalization</code> and <code>Deaths</code>, and some more in <code>RiskAll</code>. Since the missing is not excessive, and to make our life easier, we’ll drop them for now. Note however the ‘blocks’ of missing values for RiskAll. Given that these outbreaks should be entered fairly randomly into the spreadsheet, it is strange to see the NA show up in such blocks. For a real data analysis, it would be worth looking closer and checking why there is a clustering like that.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># write code to remove any observations with NA</span></a>
-<a class="sourceLine" id="cb20-2" title="2">d &lt;-<span class="st"> </span><span class="kw">drop_na</span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># write code to remove any observations with NA</span></a>
+<a class="sourceLine" id="cb15-2" title="2">d &lt;-<span class="st"> </span><span class="kw">drop_na</span>(d)</a></code></pre></div>
 <p>Let’s make sure everything has the right format (numeric/integer/factor). Adjust/recode variables as needed. You will likely find that as you convert <code>OBYear</code> to numeric, something doesn’t quite work. Take a look. Fix by removing the observation with the troublesome entry, then convert to numeric. Finally, remove the observations that have 0 as OByear - there are more than 1 now.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co">#write code that cleans OBYear, convert it to numeric. </span></a>
-<a class="sourceLine" id="cb21-2" title="2"><span class="co">#Remove observations with OBYear = 0. </span></a>
-<a class="sourceLine" id="cb21-3" title="3"><span class="kw">lapply</span>(d, class)</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co">#write code that cleans OBYear, convert it to numeric. </span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co">#Remove observations with OBYear = 0. </span></a>
+<a class="sourceLine" id="cb16-3" title="3"><span class="kw">lapply</span>(d, class)</a></code></pre></div>
 <pre><code>## $Action1
 ## [1] &quot;factor&quot;
 ## 
@@ -611,96 +605,96 @@ div.tocify {
 ## 
 ## $Vomit
 ## [1] &quot;integer&quot;</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">ind&lt;-<span class="kw">which</span>(d<span class="op">$</span>OBYear <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb23-2" title="2">d &lt;-<span class="st"> </span>d[<span class="op">-</span>ind,] </a>
-<a class="sourceLine" id="cb23-3" title="3"></a>
-<a class="sourceLine" id="cb23-4" title="4"><span class="co">#Change from factor to numeric</span></a>
-<a class="sourceLine" id="cb23-5" title="5">d<span class="op">$</span>OBYear &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">levels</span>(d<span class="op">$</span>OBYear)[d<span class="op">$</span>OBYear])</a>
-<a class="sourceLine" id="cb23-6" title="6"><span class="kw">class</span>(d<span class="op">$</span>OBYear)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">ind&lt;-<span class="kw">which</span>(d<span class="op">$</span>OBYear <span class="op">==</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb18-2" title="2">d &lt;-<span class="st"> </span>d[<span class="op">-</span>ind,] </a>
+<a class="sourceLine" id="cb18-3" title="3"></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="co">#Change from factor to numeric</span></a>
+<a class="sourceLine" id="cb18-5" title="5">d<span class="op">$</span>OBYear &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">levels</span>(d<span class="op">$</span>OBYear)[d<span class="op">$</span>OBYear])</a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="kw">class</span>(d<span class="op">$</span>OBYear)</a></code></pre></div>
 <pre><code>## [1] &quot;numeric&quot;</code></pre>
 <p>Next, we remove the <code>Unspecified</code> entry in <code>Hemisphere</code> and recode <code>Action1</code> and <code>Path1</code> as described in the Data Analysis script, i.e. from <code>Unknown</code> to <code>Unspecified</code>. Also do the same grouping into just <code>Restaurant</code> and <code>Other</code> with the <code>Setting_1</code> variable. Again, remember that there are <code>restaurant</code> and <code>Restaurant</code> values, so you need to fix that too.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="co"># write code that performs the actions described above</span></a>
-<a class="sourceLine" id="cb25-2" title="2"><span class="co"># at the end, use the droplevels() command to remove empty factor levels</span></a>
-<a class="sourceLine" id="cb25-3" title="3"></a>
-<a class="sourceLine" id="cb25-4" title="4"><span class="co">#Recoding Setting</span></a>
-<a class="sourceLine" id="cb25-5" title="5">restlist &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="st">&quot;Restaurant&quot;</span>, d<span class="op">$</span>Setting_<span class="dv">1</span>, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>, <span class="dt">value=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb25-6" title="6">otherlist &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="st">&quot;Restaurant&quot;</span>, d<span class="op">$</span>Setting_<span class="dv">1</span>, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>, <span class="dt">value=</span><span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb25-7" title="7">                  <span class="dt">invert=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb25-8" title="8">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb25-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb25-10" title="10">    <span class="dt">Setting =</span></a>
-<a class="sourceLine" id="cb25-11" title="11">      <span class="kw">fct_collapse</span>(Setting_<span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb25-12" title="12">                   <span class="dt">Restaurant =</span> restlist,</a>
-<a class="sourceLine" id="cb25-13" title="13">                   <span class="dt">Other =</span> otherlist))</a>
-<a class="sourceLine" id="cb25-14" title="14">ind&lt;-<span class="kw">which</span>(<span class="kw">colnames</span>(d)<span class="op">==</span><span class="st">&quot;Setting_1&quot;</span>)</a>
-<a class="sourceLine" id="cb25-15" title="15">d &lt;-<span class="st"> </span>d[,<span class="op">-</span>ind] </a>
-<a class="sourceLine" id="cb25-16" title="16">d<span class="op">$</span>Setting &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Setting)</a>
-<a class="sourceLine" id="cb25-17" title="17"></a>
-<a class="sourceLine" id="cb25-18" title="18"><span class="co">#Remove observation with &quot;Unspecified&quot; in Hemisphere</span></a>
-<a class="sourceLine" id="cb25-19" title="19">d &lt;-<span class="st"> </span>d[<span class="op">!</span><span class="kw">grepl</span>(<span class="st">&quot;Unspecified&quot;</span>, d<span class="op">$</span>Hemisphere),]</a>
-<a class="sourceLine" id="cb25-20" title="20"><span class="kw">levels</span>(d<span class="op">$</span>Hemisphere)</a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># write code that performs the actions described above</span></a>
+<a class="sourceLine" id="cb20-2" title="2"><span class="co"># at the end, use the droplevels() command to remove empty factor levels</span></a>
+<a class="sourceLine" id="cb20-3" title="3"></a>
+<a class="sourceLine" id="cb20-4" title="4"><span class="co">#Recoding Setting</span></a>
+<a class="sourceLine" id="cb20-5" title="5">restlist &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="st">&quot;Restaurant&quot;</span>, d<span class="op">$</span>Setting_<span class="dv">1</span>, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>, <span class="dt">value=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb20-6" title="6">otherlist &lt;-<span class="st"> </span><span class="kw">grep</span>(<span class="st">&quot;Restaurant&quot;</span>, d<span class="op">$</span>Setting_<span class="dv">1</span>, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>, <span class="dt">value=</span><span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb20-7" title="7">                  <span class="dt">invert=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb20-8" title="8">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb20-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb20-10" title="10">    <span class="dt">Setting =</span></a>
+<a class="sourceLine" id="cb20-11" title="11">      <span class="kw">fct_collapse</span>(Setting_<span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb20-12" title="12">                   <span class="dt">Restaurant =</span> restlist,</a>
+<a class="sourceLine" id="cb20-13" title="13">                   <span class="dt">Other =</span> otherlist))</a>
+<a class="sourceLine" id="cb20-14" title="14">ind&lt;-<span class="kw">which</span>(<span class="kw">colnames</span>(d)<span class="op">==</span><span class="st">&quot;Setting_1&quot;</span>)</a>
+<a class="sourceLine" id="cb20-15" title="15">d &lt;-<span class="st"> </span>d[,<span class="op">-</span>ind] </a>
+<a class="sourceLine" id="cb20-16" title="16">d<span class="op">$</span>Setting &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Setting)</a>
+<a class="sourceLine" id="cb20-17" title="17"></a>
+<a class="sourceLine" id="cb20-18" title="18"><span class="co">#Remove observation with &quot;Unspecified&quot; in Hemisphere</span></a>
+<a class="sourceLine" id="cb20-19" title="19">d &lt;-<span class="st"> </span>d[<span class="op">!</span><span class="kw">grepl</span>(<span class="st">&quot;Unspecified&quot;</span>, d<span class="op">$</span>Hemisphere),]</a>
+<a class="sourceLine" id="cb20-20" title="20"><span class="kw">levels</span>(d<span class="op">$</span>Hemisphere)</a></code></pre></div>
 <pre><code>## [1] &quot;Northern&quot;    &quot;Southern&quot;    &quot;Unspecified&quot;</code></pre>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1">d<span class="op">$</span>Hemisphere &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Hemisphere)</a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="kw">levels</span>(d<span class="op">$</span>Hemisphere)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">d<span class="op">$</span>Hemisphere &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Hemisphere)</a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="kw">levels</span>(d<span class="op">$</span>Hemisphere)</a></code></pre></div>
 <pre><code>## [1] &quot;Northern&quot; &quot;Southern&quot;</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="co">#Combine &quot;Unknown&quot; with &quot;Unspecified&quot; for Action1 and Path1</span></a>
-<a class="sourceLine" id="cb29-2" title="2"><span class="kw">levels</span>(d<span class="op">$</span>Action1)</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co">#Combine &quot;Unknown&quot; with &quot;Unspecified&quot; for Action1 and Path1</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="kw">levels</span>(d<span class="op">$</span>Action1)</a></code></pre></div>
 <pre><code>## [1] &quot;No&quot;          &quot;Unknown&quot;     &quot;Unspecified&quot; &quot;Yes&quot;</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb31-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb31-3" title="3">    <span class="dt">Action1 =</span></a>
-<a class="sourceLine" id="cb31-4" title="4">      <span class="kw">fct_collapse</span>(Action1,</a>
-<a class="sourceLine" id="cb31-5" title="5">                   <span class="dt">Unspecified =</span> <span class="kw">c</span>(<span class="st">&quot;Unspecified&quot;</span>,<span class="st">&quot;Unknown&quot;</span>),</a>
-<a class="sourceLine" id="cb31-6" title="6">                   <span class="dt">No =</span> <span class="st">&quot;No&quot;</span>,</a>
-<a class="sourceLine" id="cb31-7" title="7">                   <span class="dt">Yes =</span> <span class="st">&quot;Yes&quot;</span>))</a>
-<a class="sourceLine" id="cb31-8" title="8">d<span class="op">$</span>Action1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Action1) </a>
-<a class="sourceLine" id="cb31-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>Action1)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb26-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb26-3" title="3">    <span class="dt">Action1 =</span></a>
+<a class="sourceLine" id="cb26-4" title="4">      <span class="kw">fct_collapse</span>(Action1,</a>
+<a class="sourceLine" id="cb26-5" title="5">                   <span class="dt">Unspecified =</span> <span class="kw">c</span>(<span class="st">&quot;Unspecified&quot;</span>,<span class="st">&quot;Unknown&quot;</span>),</a>
+<a class="sourceLine" id="cb26-6" title="6">                   <span class="dt">No =</span> <span class="st">&quot;No&quot;</span>,</a>
+<a class="sourceLine" id="cb26-7" title="7">                   <span class="dt">Yes =</span> <span class="st">&quot;Yes&quot;</span>))</a>
+<a class="sourceLine" id="cb26-8" title="8">d<span class="op">$</span>Action1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Action1) </a>
+<a class="sourceLine" id="cb26-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>Action1)</a></code></pre></div>
 <pre><code>## [1] &quot;No&quot;          &quot;Unspecified&quot; &quot;Yes&quot;</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="kw">levels</span>(d<span class="op">$</span>Path1)</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="kw">levels</span>(d<span class="op">$</span>Path1)</a></code></pre></div>
 <pre><code>## [1] &quot;No&quot;          &quot;Unknown&quot;     &quot;Unspecified&quot; &quot;Yes&quot;</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb35-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb35-3" title="3">    <span class="dt">Path1 =</span></a>
-<a class="sourceLine" id="cb35-4" title="4">      <span class="kw">fct_collapse</span>(Path1,</a>
-<a class="sourceLine" id="cb35-5" title="5">                   <span class="dt">Unspecified =</span> <span class="kw">c</span>(<span class="st">&quot;Unspecified&quot;</span>,<span class="st">&quot;Unknown&quot;</span>),</a>
-<a class="sourceLine" id="cb35-6" title="6">                   <span class="dt">No =</span> <span class="st">&quot;No&quot;</span>,</a>
-<a class="sourceLine" id="cb35-7" title="7">                   <span class="dt">Yes =</span> <span class="st">&quot;Yes&quot;</span>))</a>
-<a class="sourceLine" id="cb35-8" title="8">d<span class="op">$</span>Path1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Path1) </a>
-<a class="sourceLine" id="cb35-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>Path1)</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb30-3" title="3">    <span class="dt">Path1 =</span></a>
+<a class="sourceLine" id="cb30-4" title="4">      <span class="kw">fct_collapse</span>(Path1,</a>
+<a class="sourceLine" id="cb30-5" title="5">                   <span class="dt">Unspecified =</span> <span class="kw">c</span>(<span class="st">&quot;Unspecified&quot;</span>,<span class="st">&quot;Unknown&quot;</span>),</a>
+<a class="sourceLine" id="cb30-6" title="6">                   <span class="dt">No =</span> <span class="st">&quot;No&quot;</span>,</a>
+<a class="sourceLine" id="cb30-7" title="7">                   <span class="dt">Yes =</span> <span class="st">&quot;Yes&quot;</span>))</a>
+<a class="sourceLine" id="cb30-8" title="8">d<span class="op">$</span>Path1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Path1) </a>
+<a class="sourceLine" id="cb30-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>Path1)</a></code></pre></div>
 <pre><code>## [1] &quot;No&quot;          &quot;Unspecified&quot; &quot;Yes&quot;</code></pre>
 </div>
 <div id="data-visualization" class="section level1">
 <h1>Data visualization</h1>
 <p>Next, let’s create a few plots showing the outcome and the predictors. For the continuous predictors, I suggest scatter/box/violinplots with the outcome on the x-axis.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="co">#write code that produces plots showing our outcome of interest on the x-axis and each numeric predictor on the y-axis.</span></a>
-<a class="sourceLine" id="cb37-2" title="2"><span class="co">#you can use the facet_wrap functionality in ggplot for it, or do it some other way.</span></a>
-<a class="sourceLine" id="cb37-3" title="3"></a>
-<a class="sourceLine" id="cb37-4" title="4">d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select_if</span>(is.numeric)-&gt;<span class="st"> </span>dnum</a>
-<a class="sourceLine" id="cb37-5" title="5">d[<span class="st">&#39;gg2c4&#39;</span>] -&gt;<span class="st"> </span>dnum[<span class="st">&#39;gg2c4&#39;</span>]</a>
-<a class="sourceLine" id="cb37-6" title="6"></a>
-<a class="sourceLine" id="cb37-7" title="7">dnum &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(dnum, <span class="dt">id.var=</span><span class="st">&quot;gg2c4&quot;</span>)</a>
-<a class="sourceLine" id="cb37-8" title="8"></a>
-<a class="sourceLine" id="cb37-9" title="9">dnum <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb37-10" title="10"><span class="st">  </span><span class="kw">ggplot</span>(.,<span class="kw">aes</span>(<span class="dt">x=</span>gg2c4, <span class="dt">y=</span>value)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb37-11" title="11"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb37-12" title="12"><span class="st">  </span><span class="kw">facet_wrap</span>(dnum<span class="op">$</span>variable)</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="co">#write code that produces plots showing our outcome of interest on the x-axis and each numeric predictor on the y-axis.</span></a>
+<a class="sourceLine" id="cb32-2" title="2"><span class="co">#you can use the facet_wrap functionality in ggplot for it, or do it some other way.</span></a>
+<a class="sourceLine" id="cb32-3" title="3"></a>
+<a class="sourceLine" id="cb32-4" title="4">d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select_if</span>(is.numeric)-&gt;<span class="st"> </span>dnum</a>
+<a class="sourceLine" id="cb32-5" title="5">d[<span class="st">&#39;gg2c4&#39;</span>] -&gt;<span class="st"> </span>dnum[<span class="st">&#39;gg2c4&#39;</span>]</a>
+<a class="sourceLine" id="cb32-6" title="6"></a>
+<a class="sourceLine" id="cb32-7" title="7">dnum &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(dnum, <span class="dt">id.var=</span><span class="st">&quot;gg2c4&quot;</span>)</a>
+<a class="sourceLine" id="cb32-8" title="8"></a>
+<a class="sourceLine" id="cb32-9" title="9">dnum <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb32-10" title="10"><span class="st">  </span><span class="kw">ggplot</span>(.,<span class="kw">aes</span>(<span class="dt">x=</span>gg2c4, <span class="dt">y=</span>value)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb32-11" title="11"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb32-12" title="12"><span class="st">  </span><span class="kw">facet_wrap</span>(dnum<span class="op">$</span>variable)</a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/plots-1-1.png" width="672" /></p>
 <p>Things look ok, apart from the skew in the predictors we discussed previously.</p>
 <p>Next, let’s create plots for the categorical variabless. You can use for instance <code>geom_count</code> for it, or some other representation. If you prefer lots of tables, that’s ok too.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="co">#write code that produces plots or tables showing our outcome of interest and each categorical predictor.</span></a>
-<a class="sourceLine" id="cb38-2" title="2">d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select_if</span>(is.factor)-&gt;dcat</a>
-<a class="sourceLine" id="cb38-3" title="3">dcat =<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(dcat, <span class="dt">id.var=</span><span class="st">&quot;gg2c4&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1"><span class="co">#write code that produces plots or tables showing our outcome of interest and each categorical predictor.</span></a>
+<a class="sourceLine" id="cb33-2" title="2">d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select_if</span>(is.factor)-&gt;dcat</a>
+<a class="sourceLine" id="cb33-3" title="3">dcat =<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(dcat, <span class="dt">id.var=</span><span class="st">&quot;gg2c4&quot;</span>)</a></code></pre></div>
 <pre><code>## Warning: attributes are not identical across measure variables; they will
 ## be dropped</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1"><span class="kw">ggplot</span>(dcat)<span class="op">+</span></a>
-<a class="sourceLine" id="cb40-2" title="2"><span class="st">  </span><span class="kw">geom_count</span>(<span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> gg2c4))<span class="op">+</span></a>
-<a class="sourceLine" id="cb40-3" title="3"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>variable, <span class="dt">scales=</span><span class="st">&#39;free&#39;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb40-4" title="4"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">25</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">ggplot</span>(dcat)<span class="op">+</span></a>
+<a class="sourceLine" id="cb35-2" title="2"><span class="st">  </span><span class="kw">geom_count</span>(<span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">y =</span> gg2c4))<span class="op">+</span></a>
+<a class="sourceLine" id="cb35-3" title="3"><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>variable, <span class="dt">scales=</span><span class="st">&#39;free&#39;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb35-4" title="4"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">25</span>))</a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/plots-2-1.png" width="672" /></p>
 <p>You should see from plots or tables that some of the categories are small, e.g. for Action1, the “No” category is very small. Very few entries for a given factor create problems during cross-validation (since we can’t have a level show up in the holdout if it wasn’t part of the fitting set). So let’s look at those factor variables a bit closer and fix as needed.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" title="1"><span class="co">#write code that looks at tables/summaries of factors </span></a>
-<a class="sourceLine" id="cb41-2" title="2">table_one &lt;-<span class="st"> </span><span class="kw">tableby</span>(gg2c4 <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> d)</a>
-<a class="sourceLine" id="cb41-3" title="3"><span class="kw">summary</span>(table_one)</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1"><span class="co">#write code that looks at tables/summaries of factors </span></a>
+<a class="sourceLine" id="cb36-2" title="2">table_one &lt;-<span class="st"> </span><span class="kw">tableby</span>(gg2c4 <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb36-3" title="3"><span class="kw">summary</span>(table_one)</a></code></pre></div>
 <pre><code>## 
 ## 
 ## |                                   |     No (N=592)      |     Yes (N=259)     |    Total (N=851)    | p value|
@@ -787,46 +781,46 @@ div.tocify {
 ## |&amp;nbsp;&amp;nbsp;&amp;nbsp;Restaurant       |     139 (23.5%)     |     31 (12.0%)      |     170 (20.0%)     |        |</code></pre>
 <p>You should see from your explorations above that there is only a single entry for <em>No</em> in <code>Action1</code>, and small entries for <em>Multiple</em> and <em>Unspecified</em> in <code>Country</code> and <em>Environmental</em> in <code>Trans1</code>. The single <em>No</em> should be fixed, the other somewhat small groupings might be ok. It depends on scientific rationale and method of analysis if you should modify/group those or not. We’ll do that.</p>
 <p>Change things as follows: Remove the observation for which action is <em>No</em>, combine Countries into 3 groups Japan/USA/Other, and since I don’t even know what biologically the difference is between <em>Environmental</em> and <em>Waterborne</em> transmission (seems the same route to me based on my norovirus knowledge), we’ll move the Waterborne into the environmental. Finally, I noticed there is a blank category for season. That likely means it wasn’t stated in the paper. Let’s recode that as <em>Unknown</em>. Finally, re-order data such that the outcome is the first column and again remove empty factor levels. Then look at your resulting data frame.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1"><span class="co">#Remove the observation that is &quot;No&quot; in Action1</span></a>
-<a class="sourceLine" id="cb43-2" title="2">ind&lt;-<span class="kw">which</span>(d<span class="op">$</span>Action1<span class="op">==</span><span class="st">&quot;No&quot;</span>)</a>
-<a class="sourceLine" id="cb43-3" title="3">d &lt;-<span class="st"> </span>d[<span class="op">-</span>ind,]</a>
-<a class="sourceLine" id="cb43-4" title="4">d<span class="op">$</span>Action1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Action1)</a>
-<a class="sourceLine" id="cb43-5" title="5"></a>
-<a class="sourceLine" id="cb43-6" title="6"><span class="co">#Combine Countries into Japan, USA, Other</span></a>
-<a class="sourceLine" id="cb43-7" title="7"><span class="kw">levels</span>(d<span class="op">$</span>Country)</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" title="1"><span class="co">#Remove the observation that is &quot;No&quot; in Action1</span></a>
+<a class="sourceLine" id="cb38-2" title="2">ind&lt;-<span class="kw">which</span>(d<span class="op">$</span>Action1<span class="op">==</span><span class="st">&quot;No&quot;</span>)</a>
+<a class="sourceLine" id="cb38-3" title="3">d &lt;-<span class="st"> </span>d[<span class="op">-</span>ind,]</a>
+<a class="sourceLine" id="cb38-4" title="4">d<span class="op">$</span>Action1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Action1)</a>
+<a class="sourceLine" id="cb38-5" title="5"></a>
+<a class="sourceLine" id="cb38-6" title="6"><span class="co">#Combine Countries into Japan, USA, Other</span></a>
+<a class="sourceLine" id="cb38-7" title="7"><span class="kw">levels</span>(d<span class="op">$</span>Country)</a></code></pre></div>
 <pre><code>##  [1] &quot;Australia&quot;   &quot;Austria&quot;     &quot;Brazil&quot;      &quot;Ca da&quot;       &quot;Chi &quot;       
 ##  [6] &quot;Croatia&quot;     &quot;Denmark&quot;     &quot;France&quot;      &quot;Iraq&quot;        &quot;Israel&quot;     
 ## [11] &quot;Italy&quot;       &quot;Japan&quot;       &quot;Multiple&quot;    &quot;Netherlands&quot; &quot;New Zealand&quot;
 ## [16] &quot;Norway&quot;      &quot;Other&quot;       &quot;Scotland&quot;    &quot;Spain&quot;       &quot;UK&quot;         
 ## [21] &quot;Unspecified&quot; &quot;USA&quot;</code></pre>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb45-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb45-3" title="3">    <span class="dt">Country =</span></a>
-<a class="sourceLine" id="cb45-4" title="4">      <span class="kw">fct_collapse</span>(Country,</a>
-<a class="sourceLine" id="cb45-5" title="5">                   <span class="dt">Japan =</span> <span class="st">&quot;Japan&quot;</span>,</a>
-<a class="sourceLine" id="cb45-6" title="6">                   <span class="dt">USA =</span> <span class="st">&quot;USA&quot;</span>,</a>
-<a class="sourceLine" id="cb45-7" title="7">                   <span class="dt">Other =</span> <span class="kw">c</span>(<span class="st">&quot;Australia&quot;</span>,<span class="st">&quot;Austria&quot;</span>,<span class="st">&quot;Brazil&quot;</span>,<span class="st">&quot;Ca da&quot;</span>,<span class="st">&quot;Chi &quot;</span>,<span class="st">&quot;Croatia&quot;</span>,<span class="st">&quot;Denmark&quot;</span>,</a>
-<a class="sourceLine" id="cb45-8" title="8">                             <span class="st">&quot;France&quot;</span>,<span class="st">&quot;Iraq&quot;</span>,<span class="st">&quot;Israel&quot;</span>,<span class="st">&quot;Italy&quot;</span>,<span class="st">&quot;Multiple&quot;</span>,<span class="st">&quot;Netherlands&quot;</span>,<span class="st">&quot;New Zealand&quot;</span>,</a>
-<a class="sourceLine" id="cb45-9" title="9">                             <span class="st">&quot;Norway&quot;</span>,<span class="st">&quot;Other&quot;</span>,<span class="st">&quot;Scotland&quot;</span>,<span class="st">&quot;Spain&quot;</span>,<span class="st">&quot;UK&quot;</span>,<span class="st">&quot;Unspecified&quot;</span>)))</a>
-<a class="sourceLine" id="cb45-10" title="10">d<span class="op">$</span>Country &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Country) </a>
-<a class="sourceLine" id="cb45-11" title="11"></a>
-<a class="sourceLine" id="cb45-12" title="12"><span class="co">#Combine Waterborne into Environmental for Trans1</span></a>
-<a class="sourceLine" id="cb45-13" title="13"><span class="kw">levels</span>(d<span class="op">$</span>Trans1)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb40-3" title="3">    <span class="dt">Country =</span></a>
+<a class="sourceLine" id="cb40-4" title="4">      <span class="kw">fct_collapse</span>(Country,</a>
+<a class="sourceLine" id="cb40-5" title="5">                   <span class="dt">Japan =</span> <span class="st">&quot;Japan&quot;</span>,</a>
+<a class="sourceLine" id="cb40-6" title="6">                   <span class="dt">USA =</span> <span class="st">&quot;USA&quot;</span>,</a>
+<a class="sourceLine" id="cb40-7" title="7">                   <span class="dt">Other =</span> <span class="kw">c</span>(<span class="st">&quot;Australia&quot;</span>,<span class="st">&quot;Austria&quot;</span>,<span class="st">&quot;Brazil&quot;</span>,<span class="st">&quot;Ca da&quot;</span>,<span class="st">&quot;Chi &quot;</span>,<span class="st">&quot;Croatia&quot;</span>,<span class="st">&quot;Denmark&quot;</span>,</a>
+<a class="sourceLine" id="cb40-8" title="8">                             <span class="st">&quot;France&quot;</span>,<span class="st">&quot;Iraq&quot;</span>,<span class="st">&quot;Israel&quot;</span>,<span class="st">&quot;Italy&quot;</span>,<span class="st">&quot;Multiple&quot;</span>,<span class="st">&quot;Netherlands&quot;</span>,<span class="st">&quot;New Zealand&quot;</span>,</a>
+<a class="sourceLine" id="cb40-9" title="9">                             <span class="st">&quot;Norway&quot;</span>,<span class="st">&quot;Other&quot;</span>,<span class="st">&quot;Scotland&quot;</span>,<span class="st">&quot;Spain&quot;</span>,<span class="st">&quot;UK&quot;</span>,<span class="st">&quot;Unspecified&quot;</span>)))</a>
+<a class="sourceLine" id="cb40-10" title="10">d<span class="op">$</span>Country &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Country) </a>
+<a class="sourceLine" id="cb40-11" title="11"></a>
+<a class="sourceLine" id="cb40-12" title="12"><span class="co">#Combine Waterborne into Environmental for Trans1</span></a>
+<a class="sourceLine" id="cb40-13" title="13"><span class="kw">levels</span>(d<span class="op">$</span>Trans1)</a></code></pre></div>
 <pre><code>## [1] &quot;Environmental&quot;    &quot;Foodborne&quot;        &quot;Person to Person&quot;
 ## [4] &quot;Unknown&quot;          &quot;Unspecified&quot;      &quot;Waterborne&quot;</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb47-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb47-3" title="3">    <span class="dt">Trans1 =</span></a>
-<a class="sourceLine" id="cb47-4" title="4">      <span class="kw">fct_collapse</span>(Trans1,</a>
-<a class="sourceLine" id="cb47-5" title="5">                   <span class="dt">Environmental =</span> <span class="kw">c</span>(<span class="st">&quot;Environmental&quot;</span>, <span class="st">&quot;Waterborne&quot;</span>)))</a>
-<a class="sourceLine" id="cb47-6" title="6">d<span class="op">$</span>Trans1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Trans1) </a>
-<a class="sourceLine" id="cb47-7" title="7"></a>
-<a class="sourceLine" id="cb47-8" title="8"><span class="co">#Recode the blank category for season to &quot;Unknown&quot;</span></a>
-<a class="sourceLine" id="cb47-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>season)[<span class="kw">levels</span>(d<span class="op">$</span>season)<span class="op">==</span><span class="st">&quot;&quot;</span>]&lt;-<span class="st">&quot;Unknown&quot;</span></a>
-<a class="sourceLine" id="cb47-10" title="10"></a>
-<a class="sourceLine" id="cb47-11" title="11"><span class="co">#Reorder so outcome is the first column</span></a>
-<a class="sourceLine" id="cb47-12" title="12">d &lt;-<span class="st"> </span>d[,<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,<span class="dv">6</span><span class="op">:</span><span class="dv">18</span>)]</a>
-<a class="sourceLine" id="cb47-13" title="13"><span class="kw">colnames</span>(d)</a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb42-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb42-3" title="3">    <span class="dt">Trans1 =</span></a>
+<a class="sourceLine" id="cb42-4" title="4">      <span class="kw">fct_collapse</span>(Trans1,</a>
+<a class="sourceLine" id="cb42-5" title="5">                   <span class="dt">Environmental =</span> <span class="kw">c</span>(<span class="st">&quot;Environmental&quot;</span>, <span class="st">&quot;Waterborne&quot;</span>)))</a>
+<a class="sourceLine" id="cb42-6" title="6">d<span class="op">$</span>Trans1 &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d<span class="op">$</span>Trans1) </a>
+<a class="sourceLine" id="cb42-7" title="7"></a>
+<a class="sourceLine" id="cb42-8" title="8"><span class="co">#Recode the blank category for season to &quot;Unknown&quot;</span></a>
+<a class="sourceLine" id="cb42-9" title="9"><span class="kw">levels</span>(d<span class="op">$</span>season)[<span class="kw">levels</span>(d<span class="op">$</span>season)<span class="op">==</span><span class="st">&quot;&quot;</span>]&lt;-<span class="st">&quot;Unknown&quot;</span></a>
+<a class="sourceLine" id="cb42-10" title="10"></a>
+<a class="sourceLine" id="cb42-11" title="11"><span class="co">#Reorder so outcome is the first column</span></a>
+<a class="sourceLine" id="cb42-12" title="12">d &lt;-<span class="st"> </span>d[,<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>,<span class="dv">6</span><span class="op">:</span><span class="dv">18</span>)]</a>
+<a class="sourceLine" id="cb42-13" title="13"><span class="kw">colnames</span>(d)</a></code></pre></div>
 <pre><code>##  [1] &quot;gg2c4&quot;            &quot;Action1&quot;          &quot;CasesAll&quot;        
 ##  [4] &quot;Country&quot;          &quot;Deaths&quot;           &quot;Hemisphere&quot;      
 ##  [7] &quot;Hospitalizations&quot; &quot;MeanD1&quot;           &quot;MeanI1&quot;          
@@ -847,53 +841,53 @@ div.tocify {
 <h1>Parallelization</h1>
 <p><code>mlr</code> allows you to run things in parallel by using multiple cores (<code>caret</code> does too). For instance, if you do 5x cross-validation 5x repeated, you essentially run a very similar piece of code 25 times. Normally, you would run one at a time. But if you have it on a machine with 25 cores, all those 25 could run at the same time, giving you a speed-up of 25 (or close to, there is usually some overhead related to doing things in parallel). This kind of parallel computing is sometimes called <em>embarassingly parallel</em>, because it’s so embarassingly simple to split the task into parallel streams.</p>
 <p>Since doing the subset selection below starts getting slow, and because it’s a good topic to know about, we are going to use parallelization here. <code>mlr</code> uses the package <code>parallelMap</code> for this. All you need to do is specify the number of cores/processors you want to use and start the parallel system, and <code>mlr</code> then automatically does things in parallel if feasible.</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1"><span class="co">#set the number of cores you want to use. Note that this is actually the number of &#39;logical processors&#39;, which is 2x the number of cores. On a windows machine, the number of cores/logical processors can be found in the task manager. You should only set it to what your computer has (or less). So if your computer has say 4 or 6 cores, you can set it to that, or some lower number. Setting it to a number higher than the cores your computer has doesn&#39;t further speed up things, in fact it slows things down.</span></a>
-<a class="sourceLine" id="cb49-2" title="2">ncpu=<span class="dv">4</span>;</a>
-<a class="sourceLine" id="cb49-3" title="3"><span class="co">#if you don&#39;t want to run things in parallel, or don&#39;t have multiple cores (unlikely nowadays), </span></a>
-<a class="sourceLine" id="cb49-4" title="4"><span class="co">#just comment out the line below.</span></a>
-<a class="sourceLine" id="cb49-5" title="5"><span class="kw">parallelStartSocket</span>(ncpu, <span class="dt">show.info=</span><span class="ot">FALSE</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1"><span class="co">#set the number of cores you want to use. Note that this is actually the number of &#39;logical processors&#39;, which is 2x the number of cores. On a windows machine, the number of cores/logical processors can be found in the task manager. You should only set it to what your computer has (or less). So if your computer has say 4 or 6 cores, you can set it to that, or some lower number. Setting it to a number higher than the cores your computer has doesn&#39;t further speed up things, in fact it slows things down.</span></a>
+<a class="sourceLine" id="cb44-2" title="2">ncpu=<span class="dv">4</span>;</a>
+<a class="sourceLine" id="cb44-3" title="3"><span class="co">#if you don&#39;t want to run things in parallel, or don&#39;t have multiple cores (unlikely nowadays), </span></a>
+<a class="sourceLine" id="cb44-4" title="4"><span class="co">#just comment out the line below.</span></a>
+<a class="sourceLine" id="cb44-5" title="5"><span class="kw">parallelStartSocket</span>(ncpu, <span class="dt">show.info=</span><span class="ot">FALSE</span>) </a></code></pre></div>
 </div>
 <div id="setup" class="section level1">
 <h1>Setup</h1>
 <p>Some setup settings that are used in various code chunks below.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">outcome &lt;-<span class="st"> </span>d<span class="op">$</span>gg2c4 </a>
-<a class="sourceLine" id="cb50-2" title="2">outcomename =<span class="st"> &quot;gg2c4&quot;</span></a>
-<a class="sourceLine" id="cb50-3" title="3">predictors &lt;-<span class="st"> </span>d[,<span class="op">-</span><span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb50-4" title="4">npred=<span class="kw">ncol</span>(predictors)</a>
-<a class="sourceLine" id="cb50-5" title="5"><span class="co">#set sampling method for performance evaluation</span></a>
-<a class="sourceLine" id="cb50-6" title="6"><span class="co">#here, we use 5-fold cross-validation, 5-times repeated</span></a>
-<a class="sourceLine" id="cb50-7" title="7">sampling_choice =<span class="st"> </span><span class="kw">makeResampleDesc</span>(<span class="st">&quot;RepCV&quot;</span>, <span class="dt">reps =</span> <span class="dv">5</span>, <span class="dt">folds =</span> <span class="dv">5</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1">outcome &lt;-<span class="st"> </span>d<span class="op">$</span>gg2c4 </a>
+<a class="sourceLine" id="cb45-2" title="2">outcomename =<span class="st"> &quot;gg2c4&quot;</span></a>
+<a class="sourceLine" id="cb45-3" title="3">predictors &lt;-<span class="st"> </span>d[,<span class="op">-</span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb45-4" title="4">npred=<span class="kw">ncol</span>(predictors)</a>
+<a class="sourceLine" id="cb45-5" title="5"><span class="co">#set sampling method for performance evaluation</span></a>
+<a class="sourceLine" id="cb45-6" title="6"><span class="co">#here, we use 5-fold cross-validation, 5-times repeated</span></a>
+<a class="sourceLine" id="cb45-7" title="7">sampling_choice =<span class="st"> </span><span class="kw">makeResampleDesc</span>(<span class="st">&quot;RepCV&quot;</span>, <span class="dt">reps =</span> <span class="dv">5</span>, <span class="dt">folds =</span> <span class="dv">5</span>)</a></code></pre></div>
 <div id="a-null-model" class="section level2">
 <h2>A null model</h2>
 <p>To define a null model, we need to determine what performance measure we want to track. As mentioned in the course materials, there are different performance measures. Accuracy or misclassification error is simple, it just counts the number of times the model got it right/wrong. We’ll start with that one, and then try another one later. <code>mlr</code> allows for a lot of different performance measures for both categorical and continuous outcomes, see <a href="https://mlr.mlr-org.com/articles/tutorial/performance.html">here</a> and <a href="https://mlr.mlr-org.com/articles/tutorial/measures.html">here</a>.</p>
 <p>For accuracy, the simplest null model always predicts the most frequent category. We can use that as baseline performance.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1"><span class="co">#write code that computes accuracy for a null model</span></a>
-<a class="sourceLine" id="cb51-2" title="2"><span class="co">#the null model always predicts &quot;No&quot;</span></a>
-<a class="sourceLine" id="cb51-3" title="3"><span class="kw">measureACC</span>(<span class="st">&quot;No&quot;</span>, d<span class="op">$</span>gg2c4)</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1"><span class="co">#write code that computes accuracy for a null model</span></a>
+<a class="sourceLine" id="cb46-2" title="2"><span class="co">#the null model always predicts &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb46-3" title="3">mlr<span class="op">::</span><span class="kw">measureACC</span>(<span class="st">&quot;No&quot;</span>, d<span class="op">$</span>gg2c4)</a></code></pre></div>
 <pre><code>## [1] 0.6952941</code></pre>
 <p>You should find that the null model has an accuracy of around 0.69.</p>
 </div>
 <div id="single-predictor-models" class="section level2">
 <h2>Single predictor models</h2>
 <p>Now let’s consider single predictor models, i.e. we’ll fit the outcome to each predictor one at a time to get an idea of the importance of individual predictors. To evaluate our model performance, we will use cross-validation. Since our outcome is categorical, we’ll use a logistic model.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb53-2" title="2"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
-<a class="sourceLine" id="cb53-3" title="3"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
-<a class="sourceLine" id="cb53-4" title="4">learner_name =<span class="st"> &quot;classif.binomial&quot;</span>;</a>
-<a class="sourceLine" id="cb53-5" title="5">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
-<a class="sourceLine" id="cb53-6" title="6"><span class="co"># this will contain the results</span></a>
-<a class="sourceLine" id="cb53-7" title="7">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
-<a class="sourceLine" id="cb53-8" title="8"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
-<a class="sourceLine" id="cb53-9" title="9"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
-<a class="sourceLine" id="cb53-10" title="10">{</a>
-<a class="sourceLine" id="cb53-11" title="11">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
-<a class="sourceLine" id="cb53-12" title="12">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
-<a class="sourceLine" id="cb53-13" title="13">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb53-14" title="14">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> acc )</a>
-<a class="sourceLine" id="cb53-15" title="15">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
-<a class="sourceLine" id="cb53-16" title="16">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
-<a class="sourceLine" id="cb53-17" title="17">}</a>
-<a class="sourceLine" id="cb53-18" title="18"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb48-2" title="2"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
+<a class="sourceLine" id="cb48-3" title="3"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
+<a class="sourceLine" id="cb48-4" title="4">learner_name =<span class="st"> &quot;classif.binomial&quot;</span>;</a>
+<a class="sourceLine" id="cb48-5" title="5">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
+<a class="sourceLine" id="cb48-6" title="6"><span class="co"># this will contain the results</span></a>
+<a class="sourceLine" id="cb48-7" title="7">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
+<a class="sourceLine" id="cb48-8" title="8"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
+<a class="sourceLine" id="cb48-9" title="9"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
+<a class="sourceLine" id="cb48-10" title="10">{</a>
+<a class="sourceLine" id="cb48-11" title="11">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
+<a class="sourceLine" id="cb48-12" title="12">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
+<a class="sourceLine" id="cb48-13" title="13">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb48-14" title="14">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> acc )</a>
+<a class="sourceLine" id="cb48-15" title="15">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
+<a class="sourceLine" id="cb48-16" title="16">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
+<a class="sourceLine" id="cb48-17" title="17">}</a>
+<a class="sourceLine" id="cb48-18" title="18"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -978,61 +972,61 @@ div.tocify {
 <div id="full-model" class="section level1">
 <h1>Full model</h1>
 <p>Now let’s fit a full logistic model with all predictors.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb54-2" title="2"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
-<a class="sourceLine" id="cb54-3" title="3">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb54-4" title="4">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> acc )</a>
-<a class="sourceLine" id="cb54-5" title="5">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb54-6" title="6"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb49-2" title="2"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
+<a class="sourceLine" id="cb49-3" title="3">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb49-4" title="4">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> acc )</a>
+<a class="sourceLine" id="cb49-5" title="5">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb49-6" title="6"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
 <pre><code>## acc.test.mean 
 ##         0.708</code></pre>
 <p>So a very small improvement over the simple models.</p>
 <p>Now let’s do subset selection. The code below does it several ways. It does regular forward and backward selection and floating versions of those. It also uses a genetic algorithm for selection. See the <code>mlr</code> website <a href="https://mlr.mlr-org.com/articles/tutorial/feature_selection.html">here</a> for details.</p>
 <p>Also note that I included a kind of timer in the code, to see how long things take. That’s a good idea if you run bigger models. You first run a few iterations on maybe a few cores, then you can compute how long it would take if you doubled the iterations, or doubled the cores, etc. This prevents bad surprises of trying to <em>quickly</em> run a piece of code and waiting hours. You should always use short runs to make sure everything works in principle, and only at the end do the real, long “production” runs. Otherwise you might waste hours/days/weeks waiting for results only to realize that you made a basic mistake and you have to do it all over.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
-<a class="sourceLine" id="cb56-2" title="2">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
-<a class="sourceLine" id="cb56-3" title="3"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
-<a class="sourceLine" id="cb56-4" title="4">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
-<a class="sourceLine" id="cb56-5" title="5">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
-<a class="sourceLine" id="cb56-6" title="6">ct=<span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb56-7" title="7"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
-<a class="sourceLine" id="cb56-8" title="8">{</a>
-<a class="sourceLine" id="cb56-9" title="9">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
-<a class="sourceLine" id="cb56-10" title="10">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
-<a class="sourceLine" id="cb56-11" title="11">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb56-12" title="12">                             <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb56-13" title="13">                             <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb56-14" title="14">                             <span class="dt">control =</span> ctrl, </a>
-<a class="sourceLine" id="cb56-15" title="15">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb56-16" title="16">                             <span class="dt">measures =</span> acc)</a>
-<a class="sourceLine" id="cb56-17" title="17">  </a>
-<a class="sourceLine" id="cb56-18" title="18">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
-<a class="sourceLine" id="cb56-19" title="19">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb56-20" title="20">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb56-21" title="21">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb56-22" title="22">}</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb51-2" title="2">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
+<a class="sourceLine" id="cb51-3" title="3"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
+<a class="sourceLine" id="cb51-4" title="4">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
+<a class="sourceLine" id="cb51-5" title="5">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb51-6" title="6">ct=<span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb51-7" title="7"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
+<a class="sourceLine" id="cb51-8" title="8">{</a>
+<a class="sourceLine" id="cb51-9" title="9">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
+<a class="sourceLine" id="cb51-10" title="10">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
+<a class="sourceLine" id="cb51-11" title="11">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb51-12" title="12">                             <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb51-13" title="13">                             <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb51-14" title="14">                             <span class="dt">control =</span> ctrl, </a>
+<a class="sourceLine" id="cb51-15" title="15">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb51-16" title="16">                             <span class="dt">measures =</span> acc)</a>
+<a class="sourceLine" id="cb51-17" title="17">  </a>
+<a class="sourceLine" id="cb51-18" title="18">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
+<a class="sourceLine" id="cb51-19" title="19">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb51-20" title="20">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb51-21" title="21">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb51-22" title="22">}</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with method sbs &quot;
 ## [1] &quot;doing subset selection with method sfbs &quot;
 ## [1] &quot;doing subset selection with method sfs &quot;
 ## [1] &quot;doing subset selection with method sffs &quot;</code></pre>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
-<a class="sourceLine" id="cb58-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
-<a class="sourceLine" id="cb58-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
-<a class="sourceLine" id="cb58-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
+<a class="sourceLine" id="cb53-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
+<a class="sourceLine" id="cb53-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
+<a class="sourceLine" id="cb53-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with genetic algorithm&quot;</code></pre>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb60-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb60-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb60-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
-<a class="sourceLine" id="cb60-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb60-6" title="6">                                   <span class="dt">measures =</span> acc)</a>
-<a class="sourceLine" id="cb60-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
-<a class="sourceLine" id="cb60-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb60-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb60-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
-<a class="sourceLine" id="cb60-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
-<pre><code>## [1] &quot;subset selection took 2.046167 minutes&quot;</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb55-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb55-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb55-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
+<a class="sourceLine" id="cb55-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb55-6" title="6">                                   <span class="dt">measures =</span> acc)</a>
+<a class="sourceLine" id="cb55-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
+<a class="sourceLine" id="cb55-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb55-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb55-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
+<a class="sourceLine" id="cb55-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
+<pre><code>## [1] &quot;subset selection took 2.920167 minutes&quot;</code></pre>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1080,55 +1074,53 @@ div.tocify {
 </div>
 <div id="model-performance-with-auc" class="section level1">
 <h1>Model performance with AUC</h1>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="co">#write code that computes AUC for a null model</span></a>
-<a class="sourceLine" id="cb63-2" title="2"><span class="co">#the null model always predicts &quot;No&quot;</span></a>
-<a class="sourceLine" id="cb63-3" title="3"><span class="co">#the auc function in the pROC package is useful</span></a>
-<a class="sourceLine" id="cb63-4" title="4"><span class="co">#or you can use any other package/function you want to use to compute AUC/ROC</span></a>
-<a class="sourceLine" id="cb63-5" title="5"><span class="kw">mean</span>(<span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Action1)),</a>
-<a class="sourceLine" id="cb63-6" title="6"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>CasesAll),</a>
-<a class="sourceLine" id="cb63-7" title="7"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Country)),</a>
-<a class="sourceLine" id="cb63-8" title="8"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>Deaths),</a>
-<a class="sourceLine" id="cb63-9" title="9"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Hemisphere)),</a>
-<a class="sourceLine" id="cb63-10" title="10"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>Hospitalizations),</a>
-<a class="sourceLine" id="cb63-11" title="11"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>MeanD1),</a>
-<a class="sourceLine" id="cb63-12" title="12"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>MeanI1),</a>
-<a class="sourceLine" id="cb63-13" title="13"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>MedianD1),</a>
-<a class="sourceLine" id="cb63-14" title="14"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>MedianI1),</a>
-<a class="sourceLine" id="cb63-15" title="15"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>OBYear)),</a>
-<a class="sourceLine" id="cb63-16" title="16"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Path1)),</a>
-<a class="sourceLine" id="cb63-17" title="17"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>RiskAll),</a>
-<a class="sourceLine" id="cb63-18" title="18"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>season)),</a>
-<a class="sourceLine" id="cb63-19" title="19"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Trans1)),</a>
-<a class="sourceLine" id="cb63-20" title="20"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), d<span class="op">$</span>Vomit),</a>
-<a class="sourceLine" id="cb63-21" title="21"><span class="kw">auc</span>(<span class="kw">as.numeric</span>(d<span class="op">$</span>gg2c4), <span class="kw">as.ordered</span>(d<span class="op">$</span>Setting)))</a></code></pre></div>
-<pre><code>## Setting levels: control = 1, case = 2</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="co">#write code that computes AUC for a null model</span></a>
+<a class="sourceLine" id="cb58-2" title="2"><span class="co">#the null model always predicts &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb58-3" title="3"><span class="co">#the auc function in the pROC package is useful</span></a>
+<a class="sourceLine" id="cb58-4" title="4"><span class="co">#or you can use any other package/function you want to use to compute AUC/ROC</span></a>
+<a class="sourceLine" id="cb58-5" title="5"></a>
+<a class="sourceLine" id="cb58-6" title="6"><span class="kw">auc</span>(<span class="kw">roc</span>(d<span class="op">$</span>gg2c4, <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">850</span>))) <span class="co">#doing for each </span></a></code></pre></div>
+<pre><code>## Setting levels: control = No, case = Yes</code></pre>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<pre><code>## Setting levels: control = 1, case = 2</code></pre>
-<pre><code>## Setting direction: controls &gt; cases</code></pre>
-<pre><code>## Setting levels: control = 1, case = 2</code></pre>
-<pre><code>## Setting direction: controls &lt; cases</code></pre>
-<pre><code>## [1] 0.4849806</code></pre>
+<pre><code>## Area under the curve: 0.5</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1"><span class="co">#mean(auc(as.numeric(d$gg2c4), as.ordered(d$Action1)),</span></a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="co">#auc(as.numeric(d$gg2c4), d$CasesAll),</span></a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$Country)),</span></a>
+<a class="sourceLine" id="cb62-4" title="4"><span class="co">#auc(as.numeric(d$gg2c4), d$Deaths),</span></a>
+<a class="sourceLine" id="cb62-5" title="5"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$Hemisphere)),</span></a>
+<a class="sourceLine" id="cb62-6" title="6"><span class="co">#auc(as.numeric(d$gg2c4), d$Hospitalizations),</span></a>
+<a class="sourceLine" id="cb62-7" title="7"><span class="co">#auc(as.numeric(d$gg2c4), d$MeanD1),</span></a>
+<a class="sourceLine" id="cb62-8" title="8"><span class="co">#auc(as.numeric(d$gg2c4), d$MeanI1),</span></a>
+<a class="sourceLine" id="cb62-9" title="9"><span class="co">#auc(as.numeric(d$gg2c4), d$MedianD1),</span></a>
+<a class="sourceLine" id="cb62-10" title="10"><span class="co">#auc(as.numeric(d$gg2c4), d$MedianI1),</span></a>
+<a class="sourceLine" id="cb62-11" title="11"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$OBYear)),</span></a>
+<a class="sourceLine" id="cb62-12" title="12"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$Path1)),</span></a>
+<a class="sourceLine" id="cb62-13" title="13"><span class="co">#auc(as.numeric(d$gg2c4), d$RiskAll),</span></a>
+<a class="sourceLine" id="cb62-14" title="14"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$season)),</span></a>
+<a class="sourceLine" id="cb62-15" title="15"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$Trans1)),</span></a>
+<a class="sourceLine" id="cb62-16" title="16"><span class="co">#auc(as.numeric(d$gg2c4), d$Vomit),</span></a>
+<a class="sourceLine" id="cb62-17" title="17"><span class="co">#auc(as.numeric(d$gg2c4), as.ordered(d$Setting)))</span></a></code></pre></div>
 <p>You should find that the null model has an AUC of 0.5, as expected for a “no information” model.</p>
 <p>Now we run the single-predictor models again.</p>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" title="1"><span class="co">#copy and paste the code from above for single predictor fits, but now switch to AUC instead of accuracy.</span></a>
-<a class="sourceLine" id="cb71-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb71-3" title="3"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
-<a class="sourceLine" id="cb71-4" title="4"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
-<a class="sourceLine" id="cb71-5" title="5">learner_name =<span class="st"> &quot;classif.binomial&quot;</span>;</a>
-<a class="sourceLine" id="cb71-6" title="6">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
-<a class="sourceLine" id="cb71-7" title="7"><span class="co"># this will contain the results</span></a>
-<a class="sourceLine" id="cb71-8" title="8">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
-<a class="sourceLine" id="cb71-9" title="9"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
-<a class="sourceLine" id="cb71-10" title="10"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
-<a class="sourceLine" id="cb71-11" title="11">{</a>
-<a class="sourceLine" id="cb71-12" title="12">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
-<a class="sourceLine" id="cb71-13" title="13">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
-<a class="sourceLine" id="cb71-14" title="14">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb71-15" title="15">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
-<a class="sourceLine" id="cb71-16" title="16">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
-<a class="sourceLine" id="cb71-17" title="17">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
-<a class="sourceLine" id="cb71-18" title="18">}</a>
-<a class="sourceLine" id="cb71-19" title="19"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="co">#copy and paste the code from above for single predictor fits, but now switch to AUC instead of accuracy.</span></a>
+<a class="sourceLine" id="cb63-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb63-3" title="3"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
+<a class="sourceLine" id="cb63-4" title="4"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
+<a class="sourceLine" id="cb63-5" title="5">learner_name =<span class="st"> &quot;classif.binomial&quot;</span>;</a>
+<a class="sourceLine" id="cb63-6" title="6">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
+<a class="sourceLine" id="cb63-7" title="7"><span class="co"># this will contain the results</span></a>
+<a class="sourceLine" id="cb63-8" title="8">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
+<a class="sourceLine" id="cb63-9" title="9"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
+<a class="sourceLine" id="cb63-10" title="10"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
+<a class="sourceLine" id="cb63-11" title="11">{</a>
+<a class="sourceLine" id="cb63-12" title="12">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
+<a class="sourceLine" id="cb63-13" title="13">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
+<a class="sourceLine" id="cb63-14" title="14">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb63-15" title="15">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
+<a class="sourceLine" id="cb63-16" title="16">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
+<a class="sourceLine" id="cb63-17" title="17">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
+<a class="sourceLine" id="cb63-18" title="18">}</a>
+<a class="sourceLine" id="cb63-19" title="19"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1209,61 +1201,61 @@ div.tocify {
 </table>
 <p>Looks like there are a few single-predictor models with better performance than the null model.</p>
 <p>Now let’s again fit a full model with all predictors.</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1"><span class="co">#copy and paste the code from above for the full model fit, but now switch to AUC instead of accuracy.</span></a>
-<a class="sourceLine" id="cb72-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb72-3" title="3"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
-<a class="sourceLine" id="cb72-4" title="4">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb72-5" title="5">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
-<a class="sourceLine" id="cb72-6" title="6">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb72-7" title="7"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1"><span class="co">#copy and paste the code from above for the full model fit, but now switch to AUC instead of accuracy.</span></a>
+<a class="sourceLine" id="cb64-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb64-3" title="3"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
+<a class="sourceLine" id="cb64-4" title="4">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb64-5" title="5">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
+<a class="sourceLine" id="cb64-6" title="6">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb64-7" title="7"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
 <pre><code>## auc.test.mean 
 ##     0.6800553</code></pre>
 <p>This is better than any single-predictor models. Let’s see if a sub-model can do even better.</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1"><span class="co">#copy and paste the code from above for the subset selection, but now switch to AUC instead of accuracy.</span></a>
-<a class="sourceLine" id="cb74-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
-<a class="sourceLine" id="cb74-3" title="3">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
-<a class="sourceLine" id="cb74-4" title="4"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
-<a class="sourceLine" id="cb74-5" title="5">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
-<a class="sourceLine" id="cb74-6" title="6">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
-<a class="sourceLine" id="cb74-7" title="7">ct=<span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb74-8" title="8"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
-<a class="sourceLine" id="cb74-9" title="9">{</a>
-<a class="sourceLine" id="cb74-10" title="10">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
-<a class="sourceLine" id="cb74-11" title="11">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
-<a class="sourceLine" id="cb74-12" title="12">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb74-13" title="13">                             <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb74-14" title="14">                             <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb74-15" title="15">                             <span class="dt">control =</span> ctrl, </a>
-<a class="sourceLine" id="cb74-16" title="16">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb74-17" title="17">                             <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
-<a class="sourceLine" id="cb74-18" title="18">  </a>
-<a class="sourceLine" id="cb74-19" title="19">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
-<a class="sourceLine" id="cb74-20" title="20">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb74-21" title="21">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb74-22" title="22">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb74-23" title="23">}</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1"><span class="co">#copy and paste the code from above for the subset selection, but now switch to AUC instead of accuracy.</span></a>
+<a class="sourceLine" id="cb66-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb66-3" title="3">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
+<a class="sourceLine" id="cb66-4" title="4"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
+<a class="sourceLine" id="cb66-5" title="5">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
+<a class="sourceLine" id="cb66-6" title="6">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb66-7" title="7">ct=<span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb66-8" title="8"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
+<a class="sourceLine" id="cb66-9" title="9">{</a>
+<a class="sourceLine" id="cb66-10" title="10">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
+<a class="sourceLine" id="cb66-11" title="11">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
+<a class="sourceLine" id="cb66-12" title="12">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb66-13" title="13">                             <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb66-14" title="14">                             <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb66-15" title="15">                             <span class="dt">control =</span> ctrl, </a>
+<a class="sourceLine" id="cb66-16" title="16">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb66-17" title="17">                             <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
+<a class="sourceLine" id="cb66-18" title="18">  </a>
+<a class="sourceLine" id="cb66-19" title="19">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
+<a class="sourceLine" id="cb66-20" title="20">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb66-21" title="21">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb66-22" title="22">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb66-23" title="23">}</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with method sbs &quot;
 ## [1] &quot;doing subset selection with method sfbs &quot;
 ## [1] &quot;doing subset selection with method sfs &quot;
 ## [1] &quot;doing subset selection with method sffs &quot;</code></pre>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
-<a class="sourceLine" id="cb76-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
-<a class="sourceLine" id="cb76-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
-<a class="sourceLine" id="cb76-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
+<a class="sourceLine" id="cb68-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
+<a class="sourceLine" id="cb68-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
+<a class="sourceLine" id="cb68-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with genetic algorithm&quot;</code></pre>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb78-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb78-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb78-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
-<a class="sourceLine" id="cb78-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb78-6" title="6">                                   <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
-<a class="sourceLine" id="cb78-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
-<a class="sourceLine" id="cb78-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb78-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb78-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
-<a class="sourceLine" id="cb78-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
-<pre><code>## [1] &quot;subset selection took 2.705000 minutes&quot;</code></pre>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb70-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb70-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb70-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
+<a class="sourceLine" id="cb70-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb70-6" title="6">                                   <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
+<a class="sourceLine" id="cb70-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
+<a class="sourceLine" id="cb70-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb70-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb70-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
+<a class="sourceLine" id="cb70-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
+<pre><code>## [1] &quot;subset selection took 3.077667 minutes&quot;</code></pre>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1305,16 +1297,16 @@ div.tocify {
 <div id="more-on-rocauc" class="section level1">
 <h1>More on ROC/AUC</h1>
 <p>While this is a common measure and useful to evaluate how models perform at different cut-off levels, one needs to keep in mind that this doesn’t really measure the performance of a single model, but instead the combined performance of all models with different cut-offs. In practice, if we want to use a model, we have to pick one cut-off. For that purpose, one can look at the whole ROC curve and one then usually chooses the model in the “top-left” corner of the curve, which gives the best overall performance with a good balance between FP and TP. Let’s plot that ROC curve for the model found by the GA.</p>
-<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb81-2" title="2">d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(gg2c4, sfeatga_res<span class="op">$</span>x )</a>
-<a class="sourceLine" id="cb81-3" title="3">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;rocanalysis&#39;</span>, <span class="dt">data =</span> d2, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb81-4" title="4">log_mod =<span class="st"> </span><span class="kw">train</span>(mylearner, mytask)</a>
-<a class="sourceLine" id="cb81-5" title="5">log_pred =<span class="st"> </span><span class="kw">predict</span>(log_mod, <span class="dt">task =</span> mytask)</a>
-<a class="sourceLine" id="cb81-6" title="6">df =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> log_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
-<a class="sourceLine" id="cb81-7" title="7"><span class="kw">plotROCCurves</span>(df)</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb73-2" title="2">d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(gg2c4, sfeatga_res<span class="op">$</span>x )</a>
+<a class="sourceLine" id="cb73-3" title="3">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;rocanalysis&#39;</span>, <span class="dt">data =</span> d2, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb73-4" title="4">log_mod =<span class="st"> </span><span class="kw">train</span>(mylearner, mytask)</a>
+<a class="sourceLine" id="cb73-5" title="5">log_pred =<span class="st"> </span><span class="kw">predict</span>(log_mod, <span class="dt">task =</span> mytask)</a>
+<a class="sourceLine" id="cb73-6" title="6">df =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> log_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
+<a class="sourceLine" id="cb73-7" title="7"><span class="kw">plotROCCurves</span>(df)</a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/roc-plot-1.png" width="672" /></p>
 <p>Based on this plot, a FP of around 0.5 an TP of around 0.75 seem to produce a good model. Digging into the <code>df</code> object, you can find the raw data underlying the curve in <code>df$data</code> and will find</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" title="1"><span class="kw">print</span>(df<span class="op">$</span>data[<span class="dv">29</span><span class="op">:</span><span class="dv">31</span>,])</a></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" title="1"><span class="kw">print</span>(df<span class="op">$</span>data[<span class="dv">29</span><span class="op">:</span><span class="dv">31</span>,])</a></code></pre></div>
 <pre><code>##          fpr       tpr threshold
 ## 29 0.4128596 0.7374517 0.2828283
 ## 30 0.3993232 0.7220077 0.2929293
@@ -1325,25 +1317,25 @@ div.tocify {
 <h1>Trying a different model</h1>
 <p>Let’s see if we can find another model that might perform even better. Let’s look at a Linear Discriminant Analysis (LDA) model. See e.g. chapter 4 of ISLR for more on that model. We again consider AUC as our measure. The null-model performance is the same, we need to re-do the remainder.</p>
 <p>Let’s re-run the single model, followed by the full model and subset selection.</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" title="1"><span class="co">#copy and paste the code from above for single predictor fits. Switch the learner from a the logistic model to a LDA model. Check the mlr website to figure out the name for that learner. (see &#39;integrated learner&#39; section)</span></a>
-<a class="sourceLine" id="cb84-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb84-3" title="3"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
-<a class="sourceLine" id="cb84-4" title="4"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
-<a class="sourceLine" id="cb84-5" title="5">learner_name =<span class="st"> &quot;classif.lda&quot;</span>;</a>
-<a class="sourceLine" id="cb84-6" title="6">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
-<a class="sourceLine" id="cb84-7" title="7"><span class="co"># this will contain the results</span></a>
-<a class="sourceLine" id="cb84-8" title="8">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
-<a class="sourceLine" id="cb84-9" title="9"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
-<a class="sourceLine" id="cb84-10" title="10"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
-<a class="sourceLine" id="cb84-11" title="11">{</a>
-<a class="sourceLine" id="cb84-12" title="12">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
-<a class="sourceLine" id="cb84-13" title="13">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
-<a class="sourceLine" id="cb84-14" title="14">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb84-15" title="15">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
-<a class="sourceLine" id="cb84-16" title="16">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
-<a class="sourceLine" id="cb84-17" title="17">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
-<a class="sourceLine" id="cb84-18" title="18">}</a>
-<a class="sourceLine" id="cb84-19" title="19"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" title="1"><span class="co">#copy and paste the code from above for single predictor fits. Switch the learner from a the logistic model to a LDA model. Check the mlr website to figure out the name for that learner. (see &#39;integrated learner&#39; section)</span></a>
+<a class="sourceLine" id="cb76-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb76-3" title="3"><span class="co">#set learner/model. this corresponds to a logistic model.</span></a>
+<a class="sourceLine" id="cb76-4" title="4"><span class="co">#mlr calls different models different &quot;learners&quot;</span></a>
+<a class="sourceLine" id="cb76-5" title="5">learner_name =<span class="st"> &quot;classif.lda&quot;</span>;</a>
+<a class="sourceLine" id="cb76-6" title="6">mylearner =<span class="st"> </span><span class="kw">makeLearner</span>(learner_name, <span class="dt">predict.type =</span> <span class="st">&quot;prob&quot;</span>)</a>
+<a class="sourceLine" id="cb76-7" title="7"><span class="co"># this will contain the results</span></a>
+<a class="sourceLine" id="cb76-8" title="8">unifmat=<span class="kw">data.frame</span>(<span class="dt">variable =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,npred))</a>
+<a class="sourceLine" id="cb76-9" title="9"><span class="co"># loop over each predictor, build simple dataset with just outcome and that predictor, fit it to a glm/logistic model</span></a>
+<a class="sourceLine" id="cb76-10" title="10"><span class="cf">for</span> (nn <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>npred)</a>
+<a class="sourceLine" id="cb76-11" title="11">{</a>
+<a class="sourceLine" id="cb76-12" title="12">    unidata =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">gg2c4 =</span> outcome, d[,nn<span class="op">+</span><span class="dv">1</span>] )</a>
+<a class="sourceLine" id="cb76-13" title="13">    <span class="co">## Generate the task, i.e. define outcome and predictors to be fit</span></a>
+<a class="sourceLine" id="cb76-14" title="14">    mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;unianalysis&#39;</span>, <span class="dt">data =</span> unidata, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb76-15" title="15">    model =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
+<a class="sourceLine" id="cb76-16" title="16">    unifmat[nn,<span class="dv">1</span>] =<span class="st"> </span><span class="kw">names</span>(predictors)[nn] </a>
+<a class="sourceLine" id="cb76-17" title="17">    unifmat[nn,<span class="dv">2</span>] =<span class="st"> </span>model<span class="op">$</span>aggr</a>
+<a class="sourceLine" id="cb76-18" title="18">}</a>
+<a class="sourceLine" id="cb76-19" title="19"><span class="kw">kable</span>(unifmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1422,60 +1414,60 @@ div.tocify {
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1"><span class="co">#copy and paste the code from above for the full model fit, but now for LDA. Since you already switched the learner/model above, no further adjustment should be needed</span></a>
-<a class="sourceLine" id="cb85-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb85-3" title="3"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
-<a class="sourceLine" id="cb85-4" title="4">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb85-5" title="5">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
-<a class="sourceLine" id="cb85-6" title="6">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb85-7" title="7"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" title="1"><span class="co">#copy and paste the code from above for the full model fit, but now for LDA. Since you already switched the learner/model above, no further adjustment should be needed</span></a>
+<a class="sourceLine" id="cb77-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb77-3" title="3"><span class="co">#do full model with Cross-Validation - to get an idea for the amount of over-fitting a full model does</span></a>
+<a class="sourceLine" id="cb77-4" title="4">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;fullanalysis&#39;</span>, <span class="dt">data =</span> d, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb77-5" title="5">fullmodel =<span class="st"> </span><span class="kw">resample</span>(mylearner, <span class="dt">task =</span> mytask, <span class="dt">resampling =</span> sampling_choice, <span class="dt">show.info =</span> <span class="ot">FALSE</span>, <span class="dt">measures =</span> mlr<span class="op">::</span>auc )</a>
+<a class="sourceLine" id="cb77-6" title="6">ACC_fullmodel =<span class="st"> </span>fullmodel<span class="op">$</span>aggr[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb77-7" title="7"><span class="kw">print</span>(ACC_fullmodel)</a></code></pre></div>
 <pre><code>## auc.test.mean 
 ##     0.6793437</code></pre>
-<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1"><span class="co">#copy and paste the code from above for subset selection, now for LDA. Since you already switched the learner/model above, no further adjustment should be needed</span></a>
-<a class="sourceLine" id="cb87-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
-<a class="sourceLine" id="cb87-3" title="3">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
-<a class="sourceLine" id="cb87-4" title="4"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
-<a class="sourceLine" id="cb87-5" title="5">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
-<a class="sourceLine" id="cb87-6" title="6">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
-<a class="sourceLine" id="cb87-7" title="7">ct=<span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb87-8" title="8"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
-<a class="sourceLine" id="cb87-9" title="9">{</a>
-<a class="sourceLine" id="cb87-10" title="10">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
-<a class="sourceLine" id="cb87-11" title="11">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
-<a class="sourceLine" id="cb87-12" title="12">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb87-13" title="13">                             <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb87-14" title="14">                             <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb87-15" title="15">                             <span class="dt">control =</span> ctrl, </a>
-<a class="sourceLine" id="cb87-16" title="16">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb87-17" title="17">                             <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
-<a class="sourceLine" id="cb87-18" title="18">  </a>
-<a class="sourceLine" id="cb87-19" title="19">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
-<a class="sourceLine" id="cb87-20" title="20">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb87-21" title="21">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb87-22" title="22">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
-<a class="sourceLine" id="cb87-23" title="23">}</a></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" title="1"><span class="co">#copy and paste the code from above for subset selection, now for LDA. Since you already switched the learner/model above, no further adjustment should be needed</span></a>
+<a class="sourceLine" id="cb79-2" title="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb79-3" title="3">tstart=<span class="kw">proc.time</span>(); <span class="co">#capture current CPU time for timing how long things take</span></a>
+<a class="sourceLine" id="cb79-4" title="4"><span class="co">#do 2 forms of forward and backward selection, just to compare</span></a>
+<a class="sourceLine" id="cb79-5" title="5">select_methods=<span class="kw">c</span>(<span class="st">&quot;sbs&quot;</span>,<span class="st">&quot;sfbs&quot;</span>,<span class="st">&quot;sfs&quot;</span>,<span class="st">&quot;sffs&quot;</span>) </a>
+<a class="sourceLine" id="cb79-6" title="6">resmat=<span class="kw">data.frame</span>(<span class="dt">method =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>), <span class="dt">Model =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">4</span>))</a>
+<a class="sourceLine" id="cb79-7" title="7">ct=<span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb79-8" title="8"><span class="cf">for</span> (select_method <span class="cf">in</span> select_methods) <span class="co">#loop over all stepwise selection methods</span></a>
+<a class="sourceLine" id="cb79-9" title="9">{</a>
+<a class="sourceLine" id="cb79-10" title="10">  ctrl =<span class="st"> </span><span class="kw">makeFeatSelControlSequential</span>(<span class="dt">method =</span> select_method)</a>
+<a class="sourceLine" id="cb79-11" title="11">  <span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with method %s &#39;</span>,select_method))</a>
+<a class="sourceLine" id="cb79-12" title="12">  sfeat_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb79-13" title="13">                             <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb79-14" title="14">                             <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb79-15" title="15">                             <span class="dt">control =</span> ctrl, </a>
+<a class="sourceLine" id="cb79-16" title="16">                             <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb79-17" title="17">                             <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
+<a class="sourceLine" id="cb79-18" title="18">  </a>
+<a class="sourceLine" id="cb79-19" title="19">  resmat[ct,<span class="dv">1</span>] =<span class="st"> </span>select_methods[ct]</a>
+<a class="sourceLine" id="cb79-20" title="20">  resmat[ct,<span class="dv">2</span>] =<span class="st"> </span>sfeat_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb79-21" title="21">  resmat[ct,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeat_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb79-22" title="22">  ct=ct<span class="op">+</span><span class="dv">1</span>;</a>
+<a class="sourceLine" id="cb79-23" title="23">}</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with method sbs &quot;
 ## [1] &quot;doing subset selection with method sfbs &quot;
 ## [1] &quot;doing subset selection with method sfs &quot;
 ## [1] &quot;doing subset selection with method sffs &quot;</code></pre>
-<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
-<a class="sourceLine" id="cb89-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
-<a class="sourceLine" id="cb89-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
-<a class="sourceLine" id="cb89-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" title="1"><span class="co"># do feature selection with genetic algorithm</span></a>
+<a class="sourceLine" id="cb81-2" title="2">maxit =<span class="st"> </span><span class="dv">100</span> <span class="co">#number of iterations - should be large for &#39;production run&#39;</span></a>
+<a class="sourceLine" id="cb81-3" title="3">ctrl_GA =<span class="kw">makeFeatSelControlGA</span>(<span class="dt">maxit =</span> maxit)</a>
+<a class="sourceLine" id="cb81-4" title="4"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;doing subset selection with genetic algorithm&#39;</span>))</a></code></pre></div>
 <pre><code>## [1] &quot;doing subset selection with genetic algorithm&quot;</code></pre>
-<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
-<a class="sourceLine" id="cb91-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
-<a class="sourceLine" id="cb91-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
-<a class="sourceLine" id="cb91-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
-<a class="sourceLine" id="cb91-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb91-6" title="6">                                   <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
-<a class="sourceLine" id="cb91-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
-<a class="sourceLine" id="cb91-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb91-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
-<a class="sourceLine" id="cb91-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
-<a class="sourceLine" id="cb91-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
-<pre><code>## [1] &quot;subset selection took 2.640167 minutes&quot;</code></pre>
-<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" title="1">sfeatga_res =<span class="st"> </span><span class="kw">selectFeatures</span>(<span class="dt">learner =</span> mylearner, </a>
+<a class="sourceLine" id="cb83-2" title="2">                                   <span class="dt">task =</span> mytask, </a>
+<a class="sourceLine" id="cb83-3" title="3">                                   <span class="dt">resampling =</span> sampling_choice, </a>
+<a class="sourceLine" id="cb83-4" title="4">                                   <span class="dt">control =</span> ctrl_GA, </a>
+<a class="sourceLine" id="cb83-5" title="5">                                   <span class="dt">show.info =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb83-6" title="6">                                   <span class="dt">measures =</span> mlr<span class="op">::</span>auc)</a>
+<a class="sourceLine" id="cb83-7" title="7">resmat[<span class="dv">5</span>,<span class="dv">1</span>] =<span class="st"> &quot;GA&quot;</span></a>
+<a class="sourceLine" id="cb83-8" title="8">resmat[<span class="dv">5</span>,<span class="dv">2</span>] =<span class="st"> </span>sfeatga_res<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb83-9" title="9">resmat[<span class="dv">5</span>,<span class="dv">3</span>] =<span class="st"> </span><span class="kw">paste</span>(<span class="kw">as.vector</span>(sfeatga_res<span class="op">$</span>x), <span class="dt">collapse=</span> <span class="st">&#39;, &#39;</span>)</a>
+<a class="sourceLine" id="cb83-10" title="10">runtime.minutes_SS=(<span class="kw">proc.time</span>()<span class="op">-</span>tstart)[[<span class="dv">3</span>]]<span class="op">/</span><span class="dv">60</span>; <span class="co">#total time in minutes the optimization took</span></a>
+<a class="sourceLine" id="cb83-11" title="11"><span class="kw">print</span>(<span class="kw">sprintf</span>(<span class="st">&#39;subset selection took %f minutes&#39;</span>,runtime.minutes_SS));</a></code></pre></div>
+<pre><code>## [1] &quot;subset selection took 2.718333 minutes&quot;</code></pre>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" title="1"><span class="kw">kable</span>(resmat)</a></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1513,23 +1505,23 @@ div.tocify {
 </tbody>
 </table>
 <p>It Looks like we again get some sub-models that are slightly better than the full model, at least as evaluated using the (cross-validated) AUC measure. There seems to be a bit, but not much difference in performance to the logistic model. We can take the GA model again (because it’s conveniently at the end, even if it’s not the best) and look at its ROC and compare the curves for the LDA and logistic models.</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" title="1"><span class="co">#copy the code from roc-plot above and re-do train/predict byt now save it as lda_mod and lda_pred</span></a>
-<a class="sourceLine" id="cb94-2" title="2"><span class="co">#then use generateThreshVsPerfData() with both lda_pred and log_pred (computed above) to create a structure that contains</span></a>
-<a class="sourceLine" id="cb94-3" title="3"><span class="co">#best model curves for both logistic and LDA, then plot the curves.</span></a>
-<a class="sourceLine" id="cb94-4" title="4"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
-<a class="sourceLine" id="cb94-5" title="5">d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(gg2c4, sfeatga_res<span class="op">$</span>x )</a>
-<a class="sourceLine" id="cb94-6" title="6">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;rocanalysis&#39;</span>, <span class="dt">data =</span> d2, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
-<a class="sourceLine" id="cb94-7" title="7">lda_mod =<span class="st"> </span><span class="kw">train</span>(mylearner, mytask)</a>
-<a class="sourceLine" id="cb94-8" title="8">lda_pred =<span class="st"> </span><span class="kw">predict</span>(lda_mod, <span class="dt">task =</span> mytask)</a>
-<a class="sourceLine" id="cb94-9" title="9">df =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> lda_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
-<a class="sourceLine" id="cb94-10" title="10">df2 =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> log_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
-<a class="sourceLine" id="cb94-11" title="11"><span class="kw">plotROCCurves</span>(df) </a></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" title="1"><span class="co">#copy the code from roc-plot above and re-do train/predict byt now save it as lda_mod and lda_pred</span></a>
+<a class="sourceLine" id="cb86-2" title="2"><span class="co">#then use generateThreshVsPerfData() with both lda_pred and log_pred (computed above) to create a structure that contains</span></a>
+<a class="sourceLine" id="cb86-3" title="3"><span class="co">#best model curves for both logistic and LDA, then plot the curves.</span></a>
+<a class="sourceLine" id="cb86-4" title="4"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb86-5" title="5">d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(gg2c4, sfeatga_res<span class="op">$</span>x )</a>
+<a class="sourceLine" id="cb86-6" title="6">mytask =<span class="st"> </span><span class="kw">makeClassifTask</span>(<span class="dt">id=</span><span class="st">&#39;rocanalysis&#39;</span>, <span class="dt">data =</span> d2, <span class="dt">target =</span> outcomename, <span class="dt">positive =</span> <span class="st">&quot;Yes&quot;</span>)</a>
+<a class="sourceLine" id="cb86-7" title="7">lda_mod =<span class="st"> </span><span class="kw">train</span>(mylearner, mytask)</a>
+<a class="sourceLine" id="cb86-8" title="8">lda_pred =<span class="st"> </span><span class="kw">predict</span>(lda_mod, <span class="dt">task =</span> mytask)</a>
+<a class="sourceLine" id="cb86-9" title="9">df =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> lda_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
+<a class="sourceLine" id="cb86-10" title="10">df2 =<span class="st"> </span><span class="kw">generateThreshVsPerfData</span>(<span class="kw">list</span>(<span class="dt">logistic =</span> log_pred), <span class="dt">measures =</span> <span class="kw">list</span>(fpr, tpr))</a>
+<a class="sourceLine" id="cb86-11" title="11"><span class="kw">plotROCCurves</span>(df) </a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/roc-plot-2-1.png" width="672" /></p>
-<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" title="1"><span class="kw">plotROCCurves</span>(df2)</a></code></pre></div>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" title="1"><span class="kw">plotROCCurves</span>(df2)</a></code></pre></div>
 <p><img src="Variable_Selection_files/figure-html/roc-plot-2-2.png" width="672" /></p>
 <p>You should see from the plot that the LDA model performs very similar to the Logistic model.</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" title="1"><span class="co">#close down the parallelization started at the beginning to free up resources.</span></a>
-<a class="sourceLine" id="cb96-2" title="2"><span class="kw">parallelStop</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" title="1"><span class="co">#close down the parallelization started at the beginning to free up resources.</span></a>
+<a class="sourceLine" id="cb88-2" title="2"><span class="kw">parallelStop</span>()</a></code></pre></div>
 </div>
 <div id="wrapping-up" class="section level1">
 <h1>Wrapping up</h1>
